@@ -1,26 +1,151 @@
-@import "tailwindcss";
+/* fonts */
+@font-face {
+  font-family: 'Yekan';
+  src: url('/assets/fonts/Yekan.woff2') format('woff2'),
+       url('/assets/fonts/Yekan.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
 
+/* Custom colors */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --primary-color: #1e40af;
+  --secondary-color: #3b82f6;
+  --accent-color: #f97316;
+  --bg-color: #f9fafb;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* Global reset */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* Tailwind base */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* RTL & body settings */
+body {
+  direction: rtl;
+  font-family: 'Yekan', sans-serif;
+  background-color: #f9fafb;
+  line-height: 1.6;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+html, body {
+  overflow-x: hidden;
+  width: 100%;
+}
+
+/* Layer components */
+@layer components {
+  .container {
+    @apply mx-auto max-w-screen-xl px-0;
+  }
+
+  .container-padded {
+    @apply mx-auto max-w-screen-xl px-4;
+  }
+
+  .section-title {
+    @apply text-2xl md:text-3xl font-bold mb-6 text-gray-800 relative;
+  }
+  .section-title::after {
+    content: '';
+    @apply block h-1 w-12 mt-2 rounded-full;
+    background: linear-gradient(90deg, var(--secondary-color), var(--accent-color));
+  }
+
+  .btn-primary {
+    @apply bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold transition-all duration-300 hover:bg-blue-700 hover:shadow-lg;
+  }
+  
+  .btn-secondary {
+    @apply bg-white text-blue-600 border border-blue-600 px-6 py-2 rounded-lg font-semibold transition-all duration-300 hover:bg-blue-50;
+  }
+
+  .card {
+    @apply bg-white rounded-xl shadow-md transition-transform duration-500 hover:scale-105 hover:shadow-2xl;
+  }
+
+  .category-card {
+    @apply relative overflow-hidden rounded-lg shadow-lg transition-transform transform;
+  }
+
+  .banner-overlay {
+    @apply absolute inset-0 bg-black bg-opacity-30 flex flex-col justify-center items-center text-center px-4;
+  }
+
+  /* بهبود استایل برای لیست‌های افقی */
+  .horizontal-scroll {
+    @apply flex overflow-x-auto pb-4 -mx-2 px-2;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  
+  .horizontal-scroll::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .horizontal-scroll-item {
+    @apply flex-none w-64 mx-2 snap-start;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Utilities */
+.product-grid {
+  @apply grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6;
+}
+
+.scrollable-categories {
+  @apply flex gap-x-4 overflow-x-auto py-4 px-2;
+  scroll-snap-type: x mandatory;
+}
+.scrollable-categories > * {
+  scroll-snap-align: start;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  @apply bg-gray-100;
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-blue-500 rounded-full;
+}
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-blue-600;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .section-title {
+    @apply text-xl;
+  }
+  
+  .horizontal-scroll {
+    @apply -mx-3 px-3;
+  }
+  
+  .horizontal-scroll-item {
+    @apply w-56;
+  }
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
 }
