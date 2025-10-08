@@ -444,8 +444,8 @@ const ShippingForm = ({ formData, setFormData, errors, onSaveOptions }) => {
                 <p className="text-gray-500 text-sm mb-3">
                   این آدرس به لیست آدرس‌های شما اضافه خواهد شد.
                   {selectedAddressId && (
-                    <span className="text-orange-600 block mt-1">
-  برای ذخیره آدرس جدید، ابتدا گزینه 'استفاده از آدرس جدید' را انتخاب کنید.
+ <span className="text-orange-600 block mt-1">
+  {`برای ذخیره آدرس جدید، ابتدا گزینه "استفاده از آدرس جدید" را انتخاب کنید.`}
 </span>
                   )}
                 </p>
