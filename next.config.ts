@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // اضافه کردن این بخش برای ignore کردن خطاها
+  output: 'standalone',
   eslint: {
     ignoreDuringBuilds: true,
   },
