@@ -47,7 +47,7 @@ const CategoriesPage = () => {
   
   const [newField, setNewField] = useState({
     name: '',
-    type: 'text',
+    type: 'string',
     required: false,
     options: []
   });

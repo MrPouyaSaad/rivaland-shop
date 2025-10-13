@@ -64,7 +64,7 @@ export default function AdminLayout({ children }) {
       <header className="bg-white shadow-sm border-b border-gray-200">
         <div className="px-6 py-4">
           <div className="flex justify-between items-center">
-            <h1 className="text-2xl font-bold text-gray-800">پنل مدیریت ریوالند</h1>
+            <h1 className="text-2xl font-bold text-gray-800">پنل مدیریت ســایـرون</h1>
             <div className="flex items-center space-x-4 space-x-reverse">
               <button 
                 className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700"

@@ -1,10 +1,10 @@
 import './globals.css';
 import { CartProvider } from '@/contexts/CartContext';
 export const metadata = {
-  title: 'ریوالند - Riva Land',
-  description: 'فروشگاه اینترنتی ریوالند - خرید آنلاین لوازم جانبی موبایل و کامپیوتر',
+  title: 'ســایـرون - Sairon',
+  description: 'فروشگاه اینترنتی ســایـرون - خرید آنلاین لوازم جانبی موبایل و کامپیوتر',
   icons: {
-    icon: '/r.png', // یا '/favicon.ico'
+    icon: '/sairon-logo.png', // یا '/favicon.ico'
   },
 }
 

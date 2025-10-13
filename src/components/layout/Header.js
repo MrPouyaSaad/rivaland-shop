@@ -262,10 +262,10 @@ const Header = () => {
         <div className="absolute inset-0 bg-black/20"></div>
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="relative">
-            <div className="text-2xl md:text-5xl lg:text-7xl font-black text-white/5 tracking-widest scale-110">ریـوالنـد</div>
+            <div className="text-2xl md:text-5xl lg:text-7xl font-black text-white/5 tracking-widest scale-110">ســایـرون</div>
             <div className="absolute inset-0 flex items-center justify-center">
               <h1 className="text-lg md:text-3xl lg:text-4xl font-black bg-gradient-to-r from-cyan-300 to-purple-300 bg-clip-text text-transparent tracking-tight">
-                Riva Land
+                S A I R O N
               </h1>
             </div>
           </div>
@@ -286,9 +286,10 @@ const Header = () => {
                 <div className="w-7 h-7 md:w-10 md:h-10 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-500 rounded-xl flex items-center justify-center transform group-hover:scale-105 transition-all duration-300 shadow-lg overflow-hidden">
                   <div className="relative w-full h-full">
                     <Image
-                      src="/r.png"
-                      alt="Riva Land Logo"
+                      src="/sairon-logo.png"
+                      alt="Sairon Logo"
                       fill
+                      unoptimized={true}
                       className="object-cover"
                       onError={(e) => {
                         e.target.style.display = 'none';
@@ -296,14 +297,14 @@ const Header = () => {
                       }}
                     />
                     <div className="hidden w-full h-full items-center justify-center bg-gradient-to-r from-blue-600 via-purple-600 to-pink-500">
-                      <span className="text-white font-bold text-base md:text-xl tracking-tighter">R</span>
+                      <span className="text-white font-bold text-base md:text-xl tracking-tighter">S</span>
                     </div>
                   </div>
                 </div>
                 <div className="absolute -inset-1 md:-inset-1.5 bg-gradient-to-r from-blue-600/20 via-purple-600/20 to-pink-500/20 rounded-xl blur-sm group-hover:blur transition-all duration-300 opacity-70 group-hover:opacity-100 -z-10"></div>
               </div>
               <span className="text-lg md:text-2xl lg:text-3xl font-black bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent tracking-tight">
-                ریـوالنـد
+                ســایـرون
               </span>
             </Link>
 
@@ -440,6 +441,7 @@ const Header = () => {
                                       src={productImage}
                                       alt={item.product?.name || 'محصول'}
                                       fill
+                                      unoptimized={true}
                                       className="object-cover rounded-lg"
                                       onError={(e) => {
                                         e.target.src = '/placeholder-product.jpg';

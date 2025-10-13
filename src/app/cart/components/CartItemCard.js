@@ -18,7 +18,7 @@ const CartItemCard = ({ item }) => {
   // تصویر اصلی محصول
   const mainImage = item.product?.images?.find(img => img.isMain)?.url || 
                    item.product?.images?.[0]?.url || 
-                   "/images/placeholder.jpg";
+                   "/images/placeholdesairon-logo.png";
 
   // قیمت‌ها
   const originalPrice = item.product?.price || 0;

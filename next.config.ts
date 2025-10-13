@@ -10,14 +10,14 @@ const nextConfig = {
   
   images: {
     domains: [
-      'viraland-cdm.storage.c2.liara.space',
+      'sairon-cdn.storage.c2.liara.space',
       'placehold.co',
       'localhost'
     ],
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'viraland-cdm.storage.c2.liara.space',
+        hostname: 'sairon-cdn.storage.c2.liara.space',
         port: '',
         pathname: '/**',
       },
@@ -34,14 +34,14 @@ const nextConfig = {
         pathname: '/**',
       },
     ],
-    unoptimized: true,
+    unoptimized: false,
   },
   
   async rewrites() {
     return [
       {
         source: "/api/:path*",
-        destination: `${process.env.NEXT_PUBLIC_API_BASE_URL || 'https://rivaland.liara.run'}/api/:path*`,
+        destination: `${process.env.NEXT_PUBLIC_API_BASE_URL || 'https://saironstore.liara.run'}/api/:path*`,
       },
     ];
   },

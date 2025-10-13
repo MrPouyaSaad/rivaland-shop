@@ -28,7 +28,7 @@ const AboutPage = () => {
     {
       icon: <TruckIcon className="w-8 h-8" />,
       title: "ارسال سریع و رایگان",
-      description: "ارسال رایگان برای خریدهای بالای ۱ میلیون تومان و تحویل در تهران در همان روز"
+      description: "ارسال رایگان برای خریدهای بالای 2 میلیون تومان و تحویل در تبریز در همان روز"
     },
     {
       icon: <ShieldCheckIcon className="w-8 h-8" />,
@@ -348,7 +348,7 @@ const AboutPage = () => {
                     <PhoneIcon className="w-6 h-6 ml-3 text-yellow-400" />
                     <div>
                       <div className="font-semibold">تلفن تماس</div>
-                      <div className="text-blue-100">۰۲۱-۴۴۳۶۶۷۶</div>
+                      <div className="text-blue-100">----------</div>
                     </div>
                   </div>
                   
@@ -356,7 +356,7 @@ const AboutPage = () => {
                     <ChatBubbleLeftRightIcon className="w-6 h-6 ml-3 text-green-400" />
                     <div>
                       <div className="font-semibold">واتساپ</div>
-                      <div className="text-blue-100">۰۹۱۴-۳۶۶-۰۴۷۶</div>
+                      <div className="text-blue-100">-----------</div>
                     </div>
                   </div>
                   
@@ -406,7 +406,7 @@ const AboutPage = () => {
                     شروع گفتگو
                   </a>
                   <a 
-                    href="tel:02144436676"
+                    href="tel:بزودی"
                     className="bg-white/20 hover:bg-white/30 text-white px-6 py-3 rounded-xl font-medium transition-all duration-300 flex items-center justify-center"
                   >
                     <PhoneIcon className="w-5 h-5 ml-2" />

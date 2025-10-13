@@ -1,4 +1,4 @@
-// app/order/[id]/page.js
+// app/orders/[id]/page.js
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -16,6 +16,7 @@ const OrderDetailsPage = () => {
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [processingPayment, setProcessingPayment] = useState(false);
 
   // دریافت جزئیات سفارش
   const fetchOrderDetails = async () => {
@@ -44,6 +45,35 @@ const OrderDetailsPage = () => {
       }
     } finally {
       setLoading(false);
+    }
+  };
+
+  // پرداخت سفارش
+  const handlePayment = async () => {
+    if (!order || processingPayment) return;
+
+    try {
+      setProcessingPayment(true);
+      setError(null);
+
+      // دریافت توکن پرداخت
+      const tokenResponse = await userApiService.getSamanToken(
+        order.id,
+        order.total,
+        order.address?.phone || ''
+      );
+
+      if (tokenResponse.success && tokenResponse.data?.token) {
+        // هدایت به درگاه پرداخت
+        window.location.href = `https://sep.shaparak.ir/OnlinePG/OnlinePG?Token=${tokenResponse.data.token}`;
+      } else {
+        throw new Error(tokenResponse.message || 'خطا در اتصال به درگاه پرداخت');
+      }
+    } catch (error) {
+      console.error('Payment error:', error);
+      setError(error.message || 'خطا در انجام پرداخت');
+    } finally {
+      setProcessingPayment(false);
     }
   };
 
@@ -217,7 +247,7 @@ const OrderDetailsPage = () => {
   }
 
   // صفحه خطا
-  if (error) {
+  if (error && !order) {
     return (
       <Layout>
         <div className="min-h-screen bg-gray-50 py-8">
@@ -253,6 +283,7 @@ const OrderDetailsPage = () => {
 
   const statusInfo = getStatusInfo(order.status);
   const steps = getOrderSteps(order);
+  const isPendingPayment = order.status === 'pending_payment';
 
   return (
     <Layout>
@@ -293,7 +324,45 @@ const OrderDetailsPage = () => {
                     )}
                   </div>
                 </div>
+
+                {/* دکمه پرداخت برای سفارش‌های در انتظار پرداخت */}
+                {isPendingPayment && (
+                  <div className="flex flex-col gap-3">
+                    <button
+                      onClick={handlePayment}
+                      disabled={processingPayment}
+                      className={`bg-gradient-to-r from-green-600 to-green-700 text-white px-8 py-4 rounded-xl hover:from-green-700 hover:to-green-800 transition-all shadow-lg font-semibold text-lg flex items-center justify-center gap-3 min-w-48 ${
+                        processingPayment ? 'opacity-70 cursor-not-allowed' : ''
+                      }`}
+                    >
+                      {processingPayment ? (
+                        <>
+                          <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                          <span>در حال اتصال...</span>
+                        </>
+                      ) : (
+                        <>
+                          <span>💳</span>
+                          <span>پرداخت سفارش</span>
+                        </>
+                      )}
+                    </button>
+                    <p className="text-sm text-gray-600 text-center">
+                      مبلغ: <span className="font-bold text-green-700">{formatPrice(order.total)}</span>
+                    </p>
+                  </div>
+                )}
               </div>
+
+              {/* نمایش خطا */}
+              {error && (
+                <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+                  <div className="flex items-center gap-2 text-red-700">
+                    <span>⚠️</span>
+                    <span className="font-medium">{error}</span>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Order Progress */}
@@ -360,11 +429,11 @@ const OrderDetailsPage = () => {
                       <div key={index} className="flex items-center gap-6 p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">
                         <div className="flex-shrink-0">
                           <img 
-                            src={item.product?.image || '/images/placeholder.jpg'} 
+                            src={item.product?.image || '/images/placeholdesairon-logo.png'} 
                             alt={item.product?.name}
                             className="w-20 h-20 rounded-lg object-cover border border-gray-200"
                             onError={(e) => {
-                              e.target.src = '/images/placeholder.jpg';
+                              e.target.src = '/images/placeholdesairon-logo.png';
                             }}
                           />
                         </div>
@@ -447,13 +516,42 @@ const OrderDetailsPage = () => {
                   </div>
                 </div>
 
-                {/* Back to Profile */}
-                <div className="bg-white rounded-2xl shadow-lg p-8">
+                {/* Action Buttons */}
+                <div className="bg-white rounded-2xl shadow-lg p-8 space-y-4">
+                  {isPendingPayment ? (
+                    <button
+                      onClick={handlePayment}
+                      disabled={processingPayment}
+                      className={`w-full bg-gradient-to-r from-green-600 to-green-700 text-white py-4 rounded-xl hover:from-green-700 hover:to-green-800 transition-all shadow-lg text-center font-semibold text-lg flex items-center justify-center gap-3 ${
+                        processingPayment ? 'opacity-70 cursor-not-allowed' : ''
+                      }`}
+                    >
+                      {processingPayment ? (
+                        <>
+                          <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                          <span>در حال اتصال...</span>
+                        </>
+                      ) : (
+                        <>
+                          <span>💳</span>
+                          <span>پرداخت سفارش</span>
+                        </>
+                      )}
+                    </button>
+                  ) : (
+                    <Link 
+                      href="/profile"
+                      className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-4 rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all shadow-lg text-center block font-semibold text-lg"
+                    >
+                      بازگشت به پروفایل
+                    </Link>
+                  )}
+                  
                   <Link 
-                    href="/profile"
-                    className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-4 rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all shadow-lg text-center block font-semibold text-lg"
+                    href="/products"
+                    className="w-full border border-gray-300 text-gray-700 py-4 rounded-xl hover:bg-gray-50 transition-colors text-center block font-semibold"
                   >
-                    بازگشت به پروفایل
+                    مشاهده محصولات
                   </Link>
                 </div>
               </div>

@@ -59,62 +59,143 @@ const ProductDetailPage = () => {
     '🏆 پرفروش ترین محصول'
   ];
 
-  // تابع checkCartStatus اصلاح شده
-// تابع checkCartStatus اصلاح شده
-const checkCartStatus = async (productId) => {
-  try {
-    const token = localStorage.getItem('userToken');
-    if (!token) {
-      setIsInCart(false);
-      setCurrentCartQuantity(0);
-      setQuantity(1);
-      return;
+  // توابع کمکی برای اتریبیوت‌ها
+  const getAttributeTypeColor = (type) => {
+    switch (type) {
+      case 'string':
+        return 'bg-blue-100 text-blue-700';
+      case 'number':
+        return 'bg-green-100 text-green-700';
+      case 'boolean':
+        return 'bg-purple-100 text-purple-700';
+      case 'select':
+        return 'bg-orange-100 text-orange-700';
+      case 'multi-select':
+        return 'bg-pink-100 text-pink-700';
+      default:
+        return 'bg-gray-100 text-gray-700';
+    }
+  };
+
+  const getAttributeTypeLabel = (type) => {
+    switch (type) {
+      case 'string':
+        return 'متنی';
+      case 'number':
+        return 'عددی';
+      case 'boolean':
+        return 'صحیح/غلط';
+      case 'select':
+        return 'انتخابی';
+      case 'multi-select':
+        return 'چند انتخابی';
+      default:
+        return type || 'نامشخص';
+    }
+  };
+
+  const renderAttributeValue = (attribute) => {
+    const { value, field } = attribute;
+    
+    if (field?.type === 'boolean') {
+      return (
+        <div className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
+          value === 'true' || value === true 
+            ? 'bg-green-100 text-green-700' 
+            : 'bg-red-100 text-red-700'
+        }`}>
+          {value === 'true' || value === true ? '✓ دارد' : '✗ ندارد'}
+        </div>
+      );
     }
 
-    const cartResponse = await userApiService.getCart();
-    
-    // مشکل: ساختار داده‌های سرور تغییر کرده
-    if (cartResponse.success && cartResponse.data) {
-      // ساختار جدید: response.data.items آرایه آیتم‌هاست
-      const items = Array.isArray(cartResponse.data.items) ? cartResponse.data.items : [];
+    if (field?.type === 'number') {
+      return (
+        <div className="text-lg font-bold text-gray-900">
+          {new Intl.NumberFormat('fa-IR').format(value)}
+        </div>
+      );
+    }
+
+    if (field?.type === 'select' || field?.type === 'multi-select') {
+      const values = Array.isArray(value) ? value : [value];
+      return (
+        <div className="flex flex-wrap gap-2">
+          {values.map((val, index) => (
+            <span 
+              key={index}
+              className="inline-flex items-center px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-sm font-medium border border-blue-200"
+            >
+              {val}
+            </span>
+          ))}
+        </div>
+      );
+    }
+
+    // نوع پیش فرض - string
+    return (
+      <div className="text-gray-900 font-medium text-lg leading-relaxed">
+        {value}
+      </div>
+    );
+  };
+
+  // تابع checkCartStatus اصلاح شده
+  const checkCartStatus = async (productId) => {
+    try {
+      const token = localStorage.getItem('userToken');
+      if (!token) {
+        setIsInCart(false);
+        setCurrentCartQuantity(0);
+        setQuantity(1);
+        return;
+      }
+
+      const cartResponse = await userApiService.getCart();
       
-      const cartItem = items.find(item => item && item.productId === parseInt(productId));
-      
-      if (cartItem) {
-        setIsInCart(true);
-        setCurrentCartQuantity(cartItem.quantity);
-        setQuantity(cartItem.quantity);
+      if (cartResponse.success && cartResponse.data) {
+        const items = Array.isArray(cartResponse.data.items) ? cartResponse.data.items : [];
+        
+        const cartItem = items.find(item => item && item.productId === parseInt(productId));
+        
+        if (cartItem) {
+          setIsInCart(true);
+          setCurrentCartQuantity(cartItem.quantity);
+          setQuantity(cartItem.quantity);
+        } else {
+          setIsInCart(false);
+          setCurrentCartQuantity(0);
+          setQuantity(1);
+        }
       } else {
         setIsInCart(false);
         setCurrentCartQuantity(0);
         setQuantity(1);
       }
-    } else {
+    } catch (err) {
+      console.error('Error checking cart status:', err);
       setIsInCart(false);
       setCurrentCartQuantity(0);
       setQuantity(1);
     }
-  } catch (err) {
-    console.error('Error checking cart status:', err);
-    setIsInCart(false);
-    setCurrentCartQuantity(0);
-    setQuantity(1);
-  }
-};
-// اضافه کردن این useEffect برای سینک وضعیت سبد خرید
-useEffect(() => {
-  const handleCartUpdate = () => {
-    if (productId) {
-      checkCartStatus(productId);
-    }
   };
 
-  window.addEventListener('cartUpdate', handleCartUpdate);
-  
-  return () => {
-    window.removeEventListener('cartUpdate', handleCartUpdate);
-  };
-}, [productId]);
+  // اضافه کردن این useEffect برای سینک وضعیت سبد خرید
+  useEffect(() => {
+    const handleCartUpdate = () => {
+      if (productId) {
+        checkCartStatus(productId);
+      }
+    };
+
+    window.addEventListener('cartUpdate', handleCartUpdate);
+    
+    return () => {
+      window.removeEventListener('cartUpdate', handleCartUpdate);
+    };
+  }, [productId]);
+
   // تابع fetchRecommendedProducts
   const fetchRecommendedProducts = async (productId) => {
     try {
@@ -178,73 +259,73 @@ useEffect(() => {
     return () => clearInterval(interval);
   }, [animatedTexts.length]);
 
- const handleAddToCart = async () => {
-  if (!product || product.stock === 0) return;
-  
-  if (!isAuthenticated) {
-    router.push('/sign-in?redirect=' + encodeURIComponent(window.location.pathname));
-    return;
-  }
-  
-  setAddingToCart(true);
-  setAddToCartError('');
-  
-  try {
-    const response = await userApiService.addToCart(product.id, quantity);
+  const handleAddToCart = async () => {
+    if (!product || product.stock === 0) return;
     
-    if (response.success) {
-      setIsInCart(true);
-      setCurrentCartQuantity(quantity);
-      
-      // آپدیت سبد خرید در context
-      await updateCart();
-      
-      // اطلاع‌رسانی به دیگر کامپوننت‌ها
-      window.dispatchEvent(new Event('cartUpdate'));
-      
-      showSuccessAnimation();
-    } else {
-      setAddToCartError(response.message || 'خطا در افزودن به سبد خرید');
+    if (!isAuthenticated) {
+      router.push('/sign-in?redirect=' + encodeURIComponent(window.location.pathname));
+      return;
     }
-  } catch (err) {
-    console.error('Error adding to cart:', err);
-    setAddToCartError('خطا در ارتباط با سرور');
-  } finally {
-    setAddingToCart(false);
-  }
-};
+    
+    setAddingToCart(true);
+    setAddToCartError('');
+    
+    try {
+      const response = await userApiService.addToCart(product.id, quantity);
+      
+      if (response.success) {
+        setIsInCart(true);
+        setCurrentCartQuantity(quantity);
+        
+        // آپدیت سبد خرید در context
+        await updateCart();
+        
+        // اطلاع‌رسانی به دیگر کامپوننت‌ها
+        window.dispatchEvent(new Event('cartUpdate'));
+        
+        showSuccessAnimation();
+      } else {
+        setAddToCartError(response.message || 'خطا در افزودن به سبد خرید');
+      }
+    } catch (err) {
+      console.error('Error adding to cart:', err);
+      setAddToCartError('خطا در ارتباط با سرور');
+    } finally {
+      setAddingToCart(false);
+    }
+  };
 
   const handleUpdateCart = async (newQuantity) => {
-  if (!product || newQuantity < 1) return;
-  
-  if (!isAuthenticated) {
-    router.push('/sign-in?redirect=' + encodeURIComponent(window.location.pathname));
-    return;
-  }
-  
-  setQuantity(newQuantity);
-  
-  try {
-    const response = await userApiService.updateCartItem(product.id, newQuantity);
+    if (!product || newQuantity < 1) return;
     
-    if (response.success) {
-      setCurrentCartQuantity(newQuantity);
-      
-      // آپدیت سبد خرید در context
-      await updateCart();
-      
-      // اطلاع‌رسانی به دیگر کامپوننت‌ها
-      window.dispatchEvent(new Event('cartUpdate'));
-    } else {
-      setQuantity(currentCartQuantity);
-      setAddToCartError(response.message || 'خطا در به‌روزرسانی سبد خرید');
+    if (!isAuthenticated) {
+      router.push('/sign-in?redirect=' + encodeURIComponent(window.location.pathname));
+      return;
     }
-  } catch (err) {
-    console.error('Error updating cart:', err);
-    setQuantity(currentCartQuantity);
-    setAddToCartError('خطا در ارتباط با سرور');
-  }
-};
+    
+    setQuantity(newQuantity);
+    
+    try {
+      const response = await userApiService.updateCartItem(product.id, newQuantity);
+      
+      if (response.success) {
+        setCurrentCartQuantity(newQuantity);
+        
+        // آپدیت سبد خرید در context
+        await updateCart();
+        
+        // اطلاع‌رسانی به دیگر کامپوننت‌ها
+        window.dispatchEvent(new Event('cartUpdate'));
+      } else {
+        setQuantity(currentCartQuantity);
+        setAddToCartError(response.message || 'خطا در به‌روزرسانی سبد خرید');
+      }
+    } catch (err) {
+      console.error('Error updating cart:', err);
+      setQuantity(currentCartQuantity);
+      setAddToCartError('خطا در ارتباط با سرور');
+    }
+  };
 
   const AuthRequiredButton = ({ isMobile = false }) => (
     <div className={`${isMobile ? 'space-y-3' : 'space-y-4'}`}>
@@ -472,7 +553,7 @@ useEffect(() => {
                     {product.images && product.images.length > 0 ? (
                       <div className="w-full h-full relative">
                         <Image
-                          src={product.images[selectedImage]?.url || '/images/placeholder.jpg'}
+                          src={product.images[selectedImage]?.url || '/images/placeholdesairon-logo.png'}
                           alt={product.name}
                           fill
                           className="object-contain transition-transform duration-500 group-hover:scale-105"
@@ -676,6 +757,44 @@ useEffect(() => {
                           >
                             {size.label}
                           </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* بخش اتریبیوت‌ها - اضافه شده در زیر هدر محصول */}
+                  {product.attributes && product.attributes.length > 0 && (
+                    <div className="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                      <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center">
+                        <span className="ml-2">📋</span>
+                        مشخصات فنی
+                      </h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {product.attributes.map((attribute, index) => (
+                          <div 
+                            key={attribute.id}
+                            className="bg-white p-3 rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-300"
+                            style={{
+                              animationDelay: `${index * 100}ms`,
+                              animation: 'fadeInUp 0.5s ease-out forwards'
+                            }}
+                          >
+                            <div className="flex items-center justify-between mb-2">
+                              <span className="text-sm font-medium text-gray-700 flex items-center">
+                                <span className="ml-1">🏷️</span>
+                                {attribute.field?.name || 'مشخصه'}
+                              </span>
+                              {/* <div className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                getAttributeTypeColor(attribute.field?.type)
+                              }`}>
+                                {getAttributeTypeLabel(attribute.field?.type)}
+                              </div> */}
+                            </div>
+                            
+                            <div className="mt-2">
+                              {renderAttributeValue(attribute)}
+                            </div>
+                          </div>
                         ))}
                       </div>
                     </div>
@@ -1094,6 +1213,17 @@ useEffect(() => {
         .scrollbar-track-gray-100::-webkit-scrollbar-track {
           background-color: #F3F4F6;
           border-radius: 10px;
+        }
+
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
         }
       `}</style>
     </Layout>

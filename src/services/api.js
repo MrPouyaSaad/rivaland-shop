@@ -1,5 +1,5 @@
 // services/apiService.js
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "https://rivaland.liara.run";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "https://saironostore.liara.run";
 
 class ApiService {
   constructor(tokenKey = 'userToken', redirectOn401 = false) {
@@ -615,6 +615,29 @@ class ApiService {
   async getOrderStats() {
     return await this.request('/api/orders/stats');
   }
+
+// ==== USER PAYMENTS (سامان) ====
+async getSamanToken(orderId, amount, cellNumber) {
+  return await this.request(`/api/payments/create`, {
+    method: 'POST',
+    body: JSON.stringify({ orderId, amount, cellNumber }),
+  });
+}
+
+async verifySamanPayment(refNum) {
+  return await this.request(`/api/payments/saman/verify`, {
+    method: 'POST',
+    body: JSON.stringify({ refNum }),
+  });
+}
+
+async reverseSamanPayment(refNum) {
+  return await this.request(`/api/payments/saman/reverse`, {
+    method: 'POST',
+    body: JSON.stringify({ refNum }),
+  });
+}
+
 }
 
 // ✅ ساخت دو نمونه جداگانه

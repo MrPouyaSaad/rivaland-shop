@@ -27,11 +27,11 @@ const AppDownload = () => {
           {/* Content */}
           <div className="lg:w-1/2 text-center lg:text-right">
             <h2 className="text-3xl md:text-4xl font-bold mb-6">
-              اپلیکیشن <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">ریوالند</span>
+              اپلیکیشن <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">ســایـرون</span>
             </h2>
             
             <p className="text-gray-300 text-lg mb-8 leading-relaxed">
-              تجربه خرید بهتر و سریع‌تر با اپلیکیشن موبایل ریوالند. 
+              تجربه خرید بهتر و سریع‌تر با اپلیکیشن موبایل ســایـرون. 
               از تمامی امکانات وب‌سایت به همراه ویژگی‌های اختصاصی بهره‌مند شوید.
             </p>
 
@@ -88,7 +88,7 @@ const AppDownload = () => {
                     <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-500 rounded-2xl flex items-center justify-center text-2xl text-white mx-auto mb-4">
                       R
                     </div>
-                    <h3 className="text-2xl font-bold text-gray-800 mb-2">ریوالند</h3>
+                    <h3 className="text-2xl font-bold text-gray-800 mb-2">ســایـرون</h3>
                     <p className="text-gray-600 text-sm">در حال بارگذاری...</p>
                     <div className="mt-6 w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
                   </div>

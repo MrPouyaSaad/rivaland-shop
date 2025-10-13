@@ -1,28 +1,44 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 
 const Footer = () => {
   return (
     <footer className="bg-gradient-to-b from-gray-900 to-black text-gray-200 mt-20">
-      <div className="container mx-auto px-4 py-16">
+      <div className="container mx-auto px-4 py-12 md:py-16">
         
         {/* Main Footer Content */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-10 mb-10 md:mb-12">
           
           {/* Brand & Social */}
           <div className="space-y-6">
             <div className="flex items-center space-x-2 space-x-reverse">
-              <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-lg">R</span>
+              <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                <div className="relative w-8 h-8">
+                  <Image
+                    src="/sairon-logo.png"
+                    alt="لوگو ســایـرون"
+                    fill
+                    className="object-contain"
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                      const parent = e.target.parentElement;
+                      const fallback = document.createElement('div');
+                      fallback.className = 'text-white font-bold text-lg';
+                      fallback.textContent = 'س';
+                      parent.appendChild(fallback);
+                    }}
+                  />
+                </div>
               </div>
               <span className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-                ریوالند
+                ســایـرون
               </span>
             </div>
             
-            <p className="text-gray-400 text-sm leading-relaxed max-w-xs">
-              ارائه کننده بهترین محصولات با کیفیت عالی و قیمت مناسب. تجربه خریدی لذت بخش در ریوالند.
+            <p className="text-gray-400 text-sm leading-relaxed">
+              ارائه کننده بهترین محصولات با کیفیت عالی و قیمت مناسب. تجربه خریدی لذت بخش در ســایـرون.
             </p>
             
             {/* Social Media */}
@@ -36,7 +52,7 @@ const Footer = () => {
                 <Link
                   key={index}
                   href={social.url}
-                  className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center text-lg hover:bg-gradient-to-r from-blue-500 to-purple-500 hover:text-white transition-all duration-300 transform hover:scale-110"
+                  className="w-8 h-8 md:w-10 md:h-10 bg-gray-800 rounded-full flex items-center justify-center text-base md:text-lg hover:bg-gradient-to-r from-blue-500 to-purple-500 hover:text-white transition-all duration-300 transform hover:scale-110"
                   aria-label={social.label}
                 >
                   {social.icon}
@@ -47,11 +63,11 @@ const Footer = () => {
 
           {/* Quick Links */}
           <div>
-            <h3 className="text-xl font-bold mb-6 text-white flex items-center">
+            <h3 className="text-lg md:text-xl font-bold mb-4 md:mb-6 text-white flex items-center">
               <span className="w-2 h-2 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full ml-2"></span>
               دسترسی سریع
             </h3>
-            <ul className="space-y-3">
+            <ul className="space-y-2 md:space-y-3">
               {[
                 { name: "درباره ما", href: "/about" },
                 { name: "تماس با ما", href: "/contact" },
@@ -62,7 +78,7 @@ const Footer = () => {
                 <li key={index}>
                   <Link 
                     href={link.href} 
-                    className="text-gray-400 hover:text-white transition-colors duration-300 flex items-center group text-sm"
+                    className="text-gray-400 hover:text-white transition-colors duration-300 flex items-center group text-xs md:text-sm"
                   >
                     <span className="w-1 h-1 bg-gray-600 rounded-full ml-2 group-hover:bg-gradient-to-r from-blue-500 to-purple-500 transition-all duration-300"></span>
                     {link.name}
@@ -74,11 +90,11 @@ const Footer = () => {
 
           {/* Customer Service */}
           <div>
-            <h3 className="text-xl font-bold mb-6 text-white flex items-center">
+            <h3 className="text-lg md:text-xl font-bold mb-4 md:mb-6 text-white flex items-center">
               <span className="w-2 h-2 bg-gradient-to-r from-green-500 to-blue-500 rounded-full ml-2"></span>
               خدمات مشتریان
             </h3>
-            <ul className="space-y-3">
+            <ul className="space-y-2 md:space-y-3">
               {[
                 { name: "پیگیری سفارش", href: "/track-order" },
                 { name: "بازگرداندن کالا", href: "/return-policy" },
@@ -89,7 +105,7 @@ const Footer = () => {
                 <li key={index}>
                   <Link 
                     href={link.href} 
-                    className="text-gray-400 hover:text-white transition-colors duration-300 flex items-center group text-sm"
+                    className="text-gray-400 hover:text-white transition-colors duration-300 flex items-center group text-xs md:text-sm"
                   >
                     <span className="w-1 h-1 bg-gray-600 rounded-full ml-2 group-hover:bg-gradient-to-r from-green-500 to-blue-500 transition-all duration-300"></span>
                     {link.name}
@@ -99,13 +115,13 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Contact Info - فقط اطلاعات تماس */}
+          {/* Contact Info */}
           <div>
-            <h3 className="text-xl font-bold mb-6 text-white flex items-center">
+            <h3 className="text-lg md:text-xl font-bold mb-4 md:mb-6 text-white flex items-center">
               <span className="w-2 h-2 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full ml-2"></span>
               راه‌های ارتباطی
             </h3>
-            <div className="space-y-3">
+            <div className="space-y-2 md:space-y-3">
               {[
                 { 
                   icon: "📍", 
@@ -119,15 +135,15 @@ const Footer = () => {
                 },
                 { 
                   icon: "✉️", 
-                  text: "info@rivaland.ir",
+                  text: "saironofficial@gmail.com",
                   color: "from-purple-500 to-pink-500"
                 }
               ].map((item, index) => (
-                <div key={index} className="flex items-start space-x-3 space-x-reverse">
-                  <span className={`text-lg bg-gradient-to-r ${item.color} bg-clip-text text-transparent`}>
+                <div key={index} className="flex items-start space-x-2 md:space-x-3 space-x-reverse">
+                  <span className={`text-base md:text-lg bg-gradient-to-r ${item.color} bg-clip-text text-transparent flex-shrink-0 mt-0.5`}>
                     {item.icon}
                   </span>
-                  <span className="text-gray-400 text-sm flex-1">{item.text}</span>
+                  <span className="text-gray-400 text-xs md:text-sm flex-1 leading-relaxed">{item.text}</span>
                 </div>
               ))}
             </div>
@@ -135,46 +151,46 @@ const Footer = () => {
 
         </div>
 
-        {/* سطر دوم: خبرنامه و Trust Seals در کنار هم */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+        {/* سطر دوم: خبرنامه و Trust Seals */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 mb-10 md:mb-12">
           
           {/* Newsletter */}
-          <div className="bg-gray-800/50 rounded-2xl p-6">
-            <h4 className="font-semibold mb-3 text-white text-lg">عضویت در خبرنامه</h4>
-            <p className="text-gray-400 text-sm mb-4">
+          <div className="bg-gray-800/50 rounded-xl md:rounded-2xl p-4 md:p-6">
+            <h4 className="font-semibold mb-3 text-white text-base md:text-lg">عضویت در خبرنامه</h4>
+            <p className="text-gray-400 text-xs md:text-sm mb-4">
               جدیدترین تخفیف‌ها و پیشنهادات ویژه را دریافت کنید
             </p>
             <div className="flex flex-col space-y-3">
               <input 
                 type="email"
                 placeholder="آدرس ایمیل شما"
-                className="w-full px-4 py-3 rounded-lg bg-gray-700 border border-gray-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all duration-300 text-white placeholder-gray-400"
+                className="w-full px-3 md:px-4 py-2 md:py-3 rounded-lg bg-gray-700 border border-gray-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all duration-300 text-white placeholder-gray-400 text-sm"
               />
-              <button className="bg-gradient-to-r from-blue-500 to-purple-500 text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transform hover:scale-105 transition-all duration-300">
+              <button className="bg-gradient-to-r from-blue-500 to-purple-500 text-white px-4 md:px-6 py-2 md:py-3 rounded-lg font-semibold hover:shadow-lg transform hover:scale-105 transition-all duration-300 text-sm md:text-base">
                 عضویت در خبرنامه
               </button>
             </div>
           </div>
 
           {/* Trust Seals */}
-          <div className="bg-gray-800/50 rounded-2xl p-6 flex flex-col items-center justify-center">
-            <h4 className="font-semibold mb-4 text-white text-lg text-center">گواهی‌ها و نمادها</h4>
-            {/* کد اصلاح شده اینماد بدون rel="noopener noreferrer" */}
-            <a 
-              referrerPolicy='origin'
-              target='_blank' 
-              href='https://trustseal.enamad.ir/?id=655010&Code=fWTlbiIu8k91MoHGXvb04jlediWuZlzi'
-            >
-              <img 
-                referrerPolicy='origin'
-                src='https://trustseal.enamad.ir/logo.aspx?id=655010&Code=fWTlbiIu8k91MoHGXvb04jlediWuZlzi' 
-                alt='نماد اعتماد الکترونیکی' 
-                className="hover:scale-105 transition-transform duration-300 mx-auto"
-                style={{cursor: 'pointer'}} 
-                code='fWTlbiIu8k91MoHGXvb04jlediWuZlzi'
-              />
-            </a>
-            <p className="text-gray-400 text-sm text-center mt-4">
+          <div className="bg-gray-800/50 rounded-xl md:rounded-2xl p-4 md:p-6 flex flex-col items-center justify-center">
+            <h4 className="font-semibold mb-3 md:mb-4 text-white text-base md:text-lg text-center">گواهی‌ها و نمادها</h4>
+<a
+  referrerPolicy="origin"
+  target="_blank"
+  href="https://trustseal.enamad.ir/?id=659468&Code=61cr3iUI3mHakXHdrhbGqY8BIddpdXLz"
+>
+  <img
+    referrerPolicy="origin"
+    src="https://trustseal.enamad.ir/logo.aspx?id=659468&Code=61cr3iUI3mHakXHdrhbGqY8BIddpdXLz"
+    alt=""
+    style={{ cursor: "pointer" }}
+    code="61cr3iUI3mHakXHdrhbGqY8BIddpdXLz"
+  />
+</a>
+
+
+            <p className="text-gray-400 text-xs md:text-sm text-center mt-3 md:mt-4">
               این وبسایت دارای نماد اعتماد الکترونیکی می‌باشد
             </p>
           </div>
@@ -182,21 +198,21 @@ const Footer = () => {
         </div>
 
         {/* Bottom Bar */}
-        <div className="border-t border-gray-700 pt-8">
+        <div className="border-t border-gray-700 pt-6 md:pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             {/* Copyright */}
-            <div className="text-gray-500 text-sm">
-              © {new Date().getFullYear()} ریوالند. کلیه حقوق محفوظ است.
+            <div className="text-gray-500 text-xs md:text-sm text-center md:text-right">
+              © {new Date().getFullYear()} ســایـرون. کلیه حقوق محفوظ است.
             </div>
 
             {/* Payment Methods */}
-            <div className="flex items-center space-x-4 space-x-reverse">
+            {/* <div className="flex items-center space-x-3 md:space-x-4 space-x-reverse">
               {["💳", "🏦", "📱", "💻"].map((method, index) => (
-                <span key={index} className="text-lg bg-gray-700 p-2 rounded-lg">
+                <span key={index} className="text-base md:text-lg bg-gray-700 p-1.5 md:p-2 rounded-lg">
                   {method}
                 </span>
               ))}
-            </div>
+            </div> */}
           </div>
         </div>
 

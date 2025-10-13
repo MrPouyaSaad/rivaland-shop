@@ -96,84 +96,97 @@ export default function ProductsPageContent() {
       };
 
       // بررسی ساختار پاسخ
-      if (response.success) {
-        // اگر پاسخ دارای success باشد
-        productsData = response.data?.products || response.data || response.products || [];
-        paginationInfo = {
-          totalPages: response.data?.totalPages || response.totalPages || response.data?.pagination?.totalPages || 1,
-          total: response.data?.total || response.total || response.data?.pagination?.total || productsData.length,
-          currentPage: response.data?.currentPage || response.currentPage || response.data?.pagination?.page || currentPage
-        };
-      } else if (Array.isArray(response)) {
-        // اگر پاسخ مستقیم آرایه باشد
-        productsData = response;
-        paginationInfo = {
-          totalPages: 1,
-          total: response.length,
-          currentPage: currentPage
-        };
-      } else {
-        // سایر فرمت‌ها
-        productsData = response.products || response.data || [];
-        paginationInfo = {
-          totalPages: response.totalPages || response.pagination?.totalPages || 1,
-          total: response.total || response.pagination?.total || productsData.length,
-          currentPage: response.currentPage || response.pagination?.page || currentPage
-        };
-      }
+if (response.success) {
+  // اگر data خودش آرایه محصولات است
+  if (Array.isArray(response.data)) {
+    productsData = response.data;
+    paginationInfo = {
+      totalPages: response.pagination?.totalPages || 1,
+      total: response.pagination?.total || response.data.length,
+      currentPage: response.pagination?.page || currentPage
+    };
+  } 
+  // اگر data یک آبجکت شامل products است
+  else if (response.data?.products) {
+    productsData = response.data.products;
+    paginationInfo = {
+      totalPages: response.data.pagination?.totalPages || 1,
+      total: response.data.pagination?.total || response.data.products.length,
+      currentPage: response.data.pagination?.page || currentPage
+    };
+  } 
+  // سایر حالت‌ها
+  else {
+    productsData = response.data || response.products || [];
+    paginationInfo = {
+      totalPages: response.data?.pagination?.totalPages || 1,
+      total: response.data?.pagination?.total || productsData.length,
+      currentPage: response.data?.pagination?.page || currentPage
+    };
+  }
+}
+
       
-      // پردازش محصولات برای نمایش
-      const processedProducts = productsData.map(product => {
-        // محاسبه قیمت اصلی و تخفیف
-        let originalPrice = product.price || 0;
-        let finalPrice = product.price || 0;
-        let discountPercent = 0;
-        let hasDiscount = false;
-        
-        // اگر تخفیف وجود دارد
-        if (product.discount && product.discount > 0) {
-          hasDiscount = true;
-          if (product.discountType === 'percent') {
-            // تخفیف درصدی
-            discountPercent = product.discount;
-            finalPrice = originalPrice - (originalPrice * product.discount / 100);
-          } else if (product.discountType === 'amount') {
-            // تخفیف مبلغی - تبدیل به درصد
-            discountPercent = Math.round((product.discount / originalPrice) * 100);
-            finalPrice = originalPrice - product.discount;
-          }
-        }
-        
-        // پیدا کردن تصویر اصلی
-        let mainImage = "https://placehold.co/300x300/f3f4f6/000?text=Product+Image";
-        if (product.image) {
-          mainImage = product.image;
-        } else if (product.images && product.images.length > 0) {
-          // پیدا کردن تصویر اصلی یا اولین تصویر
-          const mainImg = product.images.find(img => img.isMain === true);
-          if (mainImg) {
-            mainImage = typeof mainImg === 'string' ? mainImg : mainImg.url;
-          } else {
-            mainImage = typeof product.images[0] === 'string' ? product.images[0] : product.images[0].url;
-          }
-        }
-        
-        return {
-          id: product.id || product._id,
-          title: product.name || product.title,
-          price: finalPrice, // قیمت نهایی بعد از تخفیف
-          originalPrice: originalPrice, // قیمت اصلی قبل از تخفیف
-          image: mainImage,
-          isNew: product.isNew || 
-                 (product.createdAt && (new Date() - new Date(product.createdAt)) < (30 * 24 * 60 * 60 * 1000)),
-          isBestseller: product.isBestseller || false,
-          isFastDelivery: product.isFastDelivery || false,
-          discount: discountPercent, // همیشه درصد تخفیف
-          hasDiscount: hasDiscount,
-          discountType: product.discountType,
-          originalDiscount: product.discount
-        };
-      });
+     // پردازش محصولات برای نمایش
+const processedProducts = productsData.map((product) => {
+  // قیمت اصلی
+  const originalPrice = product.price || 0;
+  let finalPrice = originalPrice;
+  let discountPercent = 0;
+  let hasDiscount = false;
+
+  // محاسبه تخفیف
+  if (product.discount && product.discount > 0) {
+    hasDiscount = true;
+    if (product.discountType === "percent") {
+      discountPercent = product.discount;
+      finalPrice = Math.round(originalPrice - (originalPrice * discountPercent) / 100);
+    } else if (product.discountType === "amount") {
+      discountPercent = Math.round((product.discount / originalPrice) * 100);
+      finalPrice = Math.max(originalPrice - product.discount, 0);
+    }
+  }
+
+  // پیدا کردن تصویر اصلی یا پیش‌فرض
+  let mainImage = "https://placehold.co/300x300/f3f4f6/000?text=Product+Image";
+  if (product.image) {
+    mainImage = product.image;
+  } else if (product.images && product.images.length > 0) {
+    const mainImg = product.images.find((img) => img.isMain) || product.images[0];
+    mainImage = typeof mainImg === "string" ? mainImg : mainImg.url;
+  }
+
+  // لیبل‌ها (پرفروش، پیشنهادی و ...)
+  const labels = product.labels || [];
+
+  return {
+    id: product.id || product._id,
+    name: product.name || product.title, // 👈 حالا ProductCard درست کار می‌کنه
+    price: finalPrice,                   // قیمت نهایی بعد از تخفیف
+    originalPrice: originalPrice,        // قیمت اصلی قبل از تخفیف
+    image: mainImage,                    // تصویر اصلی
+    images: product.images || [],        // 👈 اضافه شد برای سازگاری با ProductCard
+    labels: labels,                      // 👈 اضافه شد برای نمایش badgeها
+    isNew:
+      product.isNew ||
+      (product.createdAt &&
+        new Date() - new Date(product.createdAt) <
+          30 * 24 * 60 * 60 * 1000),
+    isBestseller:
+      product.isBestseller ||
+      labels.some(
+        (l) =>
+          l.label?.name === "bestseller" || l.label?.title === "پرفروش"
+      ),
+    isFastDelivery: product.isFastDelivery || false,
+    discount: discountPercent,           // درصد تخفیف
+    hasDiscount: hasDiscount,
+    discountType: product.discountType,
+    originalDiscount: product.discount,
+  };
+});
+
+        console.log("🧩 processedProducts:", processedProducts);
       
       setProducts(processedProducts);
       setTotalPages(paginationInfo.totalPages);
