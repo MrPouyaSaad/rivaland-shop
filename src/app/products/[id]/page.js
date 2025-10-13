@@ -556,6 +556,7 @@ const ProductDetailPage = () => {
                           src={product.images[selectedImage]?.url || '/images/placeholdesairon-logo.png'}
                           alt={product.name}
                           fill
+                          unoptimized={true}
                           className="object-contain transition-transform duration-500 group-hover:scale-105"
                           priority
                           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 40vw, 35vw"
@@ -1058,6 +1059,7 @@ const ProductDetailPage = () => {
                             <Image
                               src={product.image}
                               alt={product.name}
+                              unoptimized={true}
                               fill
                               className="object-contain transition-transform duration-500 group-hover:scale-110"
                               sizes="(max-width: 768px) 50vw, (max-width: 1200px) 25vw, 20vw"

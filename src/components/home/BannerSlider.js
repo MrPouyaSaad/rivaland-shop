@@ -101,6 +101,7 @@ export default function BannerSlider() {
                 src={slides[currentIndex]?.image}
                 alt={slides[currentIndex]?.alt}
                 fill
+                unoptimized={true}
                 className="object-cover"
                 priority={currentIndex === 0}
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 70vw"
