@@ -130,7 +130,7 @@ const AboutPage = () => {
                   className="bg-white/20 hover:bg-white/30 text-white px-8 py-3 rounded-xl font-medium transition-all duration-300 transform hover:scale-105 flex items-center justify-center backdrop-blur-sm"
                 >
                   <PhoneIcon className="w-5 h-5 ml-2" />
-                  ۰۲۱-۴۴۳۶۶۷۶
+                  09028430830
                 </a>
               </div>
             </div>
@@ -313,7 +313,7 @@ const AboutPage = () => {
           <div className="text-center mb-16">
             <h2 className="text-3xl lg:text-4xl font-bold mb-4">تیم متخصص ما</h2>
             <p className="text-lg text-blue-200 max-w-3xl mx-auto">
-              تیمی از متخصصان passionate که عاشق کمک به شما هستند
+              تیمی از متخصصان سایرون که عاشق کمک به شما هستند
             </p>
           </div>
           
@@ -348,7 +348,8 @@ const AboutPage = () => {
                     <PhoneIcon className="w-6 h-6 ml-3 text-yellow-400" />
                     <div>
                       <div className="font-semibold">تلفن تماس</div>
-                      <div className="text-blue-100">----------</div>
+                      <div className="text-blue-100">09337357302</div>
+                      <div className="text-blue-100">09028430830</div>
                     </div>
                   </div>
                   
@@ -356,7 +357,8 @@ const AboutPage = () => {
                     <ChatBubbleLeftRightIcon className="w-6 h-6 ml-3 text-green-400" />
                     <div>
                       <div className="font-semibold">واتساپ</div>
-                      <div className="text-blue-100">-----------</div>
+                      <div className="text-blue-100">09337357302</div>
+                      <div className="text-blue-100">09028430830</div>
                     </div>
                   </div>
                   
@@ -364,7 +366,7 @@ const AboutPage = () => {
                     <EnvelopeIcon className="w-6 h-6 ml-3 text-red-400" />
                     <div>
                       <div className="font-semibold">ایمیل</div>
-                      <div className="text-blue-100">info@techaccessory.ir</div>
+                      <div className="text-blue-100">saironstore.ir@gmail.com</div>
                     </div>
                   </div>
                   
@@ -372,7 +374,8 @@ const AboutPage = () => {
                     <MapPinIcon className="w-6 h-6 ml-3 text-purple-400" />
                     <div>
                       <div className="font-semibold">آدرس</div>
-                      <div className="text-blue-100">تهران، خیابان ولیعصر</div>
+                      {/* <div className="text-blue-100">آماده ارائه خدمات در سراسر کشور به صورت آنلاین</div> */}
+                      <div className="text-blue-100">تبریز، ائلگلی، سینا ، گلبرگ، پلاک صفر</div>
                     </div>
                   </div>
                 </div>
@@ -397,7 +400,7 @@ const AboutPage = () => {
                 
                 <div className="mt-8 flex flex-col sm:flex-row gap-4">
                   <a 
-                    href="https://wa.me/989143660476"
+                    href="https://wa.me/989337357302"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-xl font-medium transition-all duration-300 flex items-center justify-center"

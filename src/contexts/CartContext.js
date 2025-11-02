@@ -23,31 +23,38 @@ export const CartProvider = ({ children }) => {
     try {
       setIsLoading(true);
       const response = await userApiService.getCart();
-      console.log('Cart API Response:', response); // برای دیباگ
+      console.log('📦 Cart API Full Response:', response); // برای دیباگ
       
-      if (response.success && response.data) {
-        const items = Array.isArray(response.data.items) ? response.data.items : [];
-        const totalQuantity = response.data.totalQuantity || 0;
-        const total = response.data.summary?.total || 0;
+      // بررسی ساختار پاسخ - ممکن است داده‌ها در response.data.data باشند
+      const cartData = response.data?.data || response.data;
+      
+      if (response.success && cartData) {
+        const items = Array.isArray(cartData.items) ? cartData.items : [];
+        
+        // محاسبه تعداد کل آیتم‌ها
+        const totalQuantity = items.reduce((total, item) => total + (item.quantity || 0), 0);
+        
+        // استفاده از total از پاسخ یا محاسبه دستی
+        const total = cartData.subtotal || cartData.summary?.total || 0;
         
         setCartItems(items);
         setCartTotal(total);
         setCartCount(totalQuantity);
         
-        console.log('Cart Updated:', { 
-          items, 
-          total, 
+        console.log('🛒 Cart State Updated:', { 
+          itemsCount: items.length,
           totalQuantity,
-          subtotal: response.data.subtotal,
-          summary: response.data.summary
+          total,
+          items
         });
       } else {
+        console.log('🛒 Cart Empty or Failed');
         setCartItems([]);
         setCartTotal(0);
         setCartCount(0);
       }
     } catch (error) {
-      console.error('Error fetching cart:', error);
+      console.error('❌ Error fetching cart:', error);
       setCartItems([]);
       setCartTotal(0);
       setCartCount(0);
@@ -57,6 +64,7 @@ export const CartProvider = ({ children }) => {
   };
 
   const updateCart = async () => {
+    console.log('🔄 Manual cart update triggered');
     await fetchCartData();
   };
 
@@ -66,10 +74,36 @@ export const CartProvider = ({ children }) => {
     setCartCount(0);
   };
 
+  // افزودن تابع برای افزودن آیتم به صورت محلی (اختیاری)
+  const addItemToCart = (item) => {
+    setCartItems(prev => {
+      const existingItem = prev.find(i => 
+        i.productId === item.productId && 
+        i.variantId === item.variantId
+      );
+      
+      if (existingItem) {
+        return prev.map(i =>
+          i.productId === item.productId && i.variantId === item.variantId
+            ? { ...i, quantity: i.quantity + item.quantity }
+            : i
+        );
+      } else {
+        return [...prev, item];
+      }
+    });
+    
+    setCartCount(prev => prev + item.quantity);
+  };
+
   useEffect(() => {
     const token = localStorage.getItem('userToken');
     if (token) {
+      console.log('🔐 User authenticated, fetching cart...');
       fetchCartData();
+    } else {
+      console.log('🔓 User not authenticated, clearing cart');
+      clearCart();
     }
   }, []);
 
@@ -77,6 +111,7 @@ export const CartProvider = ({ children }) => {
   useEffect(() => {
     const handleStorageChange = () => {
       const token = localStorage.getItem('userToken');
+      console.log('💾 Storage changed, checking auth...');
       if (token) {
         fetchCartData();
       } else {
@@ -85,6 +120,7 @@ export const CartProvider = ({ children }) => {
     };
 
     const handleCartUpdate = () => {
+      console.log('🔄 Cart update event received');
       fetchCartData();
     };
 
@@ -105,7 +141,8 @@ export const CartProvider = ({ children }) => {
       isLoading,
       updateCart,
       clearCart,
-      fetchCartData
+      fetchCartData,
+      addItemToCart
     }}>
       {children}
     </CartContext.Provider>

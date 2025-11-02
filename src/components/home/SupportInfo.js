@@ -93,62 +93,55 @@ const SupportInfo = () => {
               </div>
               <h3 className="font-semibold mb-1 md:mb-2 text-xs sm:text-sm md:text-base">پشتیبانی تلفنی</h3>
               <a 
-                href="tel:02123456789" 
+                href="tel:09028430830" 
                 className="text-white hover:text-blue-200 transition-colors font-mono text-xs sm:text-sm md:text-lg block"
               >
-                بزودی
+                ۰۹۰۲۸۴۳۰۸۳۰
               </a>
-              <p className="text-blue-100 text-xs mt-1">خط اول پشتیبانی</p>
+              <p className="text-blue-100 text-xs mt-1">خط مستقیم پشتیبانی</p>
             </div>
 
-            {/* Phone Support 2 */}
+            {/* WhatsApp Support */}
             <div className="bg-white/10 rounded-lg md:rounded-xl p-3 md:p-6 text-center backdrop-blur-sm">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 mx-auto mb-1 md:mb-3 bg-white/20 rounded-full flex items-center justify-center">
-                <svg className="w-4 h-4 sm:w-5 sm:w-5 md:w-6 md:h-6" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
-                </svg>
-              </div>
-              <h3 className="font-semibold mb-1 md:mb-2 text-xs sm:text-sm md:text-base">پشتیبانی تلفنی</h3>
-              <a 
-                href="tel:02123456790" 
-                className="text-white hover:text-blue-200 transition-colors font-mono text-xs sm:text-sm md:text-lg block"
-              >
-                بزودی
-              </a>
-              <p className="text-blue-100 text-xs mt-1">خط دوم پشتیبانی</p>
-            </div>
-
-            {/* WhatsApp & Email */}
-            <div className="bg-white/10 rounded-lg md:rounded-xl p-3 md:p-6 text-center backdrop-blur-sm col-span-1 sm:col-span-2 lg:col-span-1">
               <div className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 mx-auto mb-1 md:mb-3 bg-white/20 rounded-full flex items-center justify-center">
                 <svg className="w-4 h-4 sm:w-5 sm:w-5 md:w-6 md:h-6" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-5.46-4.45-9.91-9.91-9.91zm-5.63 12.57c-.24-.13-.71-.45-.83-.79-.12-.34-.12-.64.13-1.01.2-.29.45-.49.78-.76.77-.64 1.22-.78 1.57-.78.35 0 .57.03.78.15.22.12.34.35.67 1.07.33.71.47 1.03.78 1.03.31 0 .78-.48 1.22-1.01.44-.53.78-.78 1.22-.78.44 0 .67.12.89.45.22.33.78 1.57 1.22 2.13.44.56.78.78 1.34.78.56 0 1.12-.34 1.56-1.01.44-.67.78-1.45.78-2.24 0-.79-.45-1.34-.89-1.34-.44 0-.89.22-1.56.67-.67.45-1.34.67-1.78.67-.44 0-.78-.22-1.34-.67-.56-.45-1.12-.67-1.78-.67-.67 0-1.45.22-2.24.67-.79.45-1.34 1.12-1.34 1.78 0 .22.03.44.1.67z"/>
                 </svg>
               </div>
-              <h3 className="font-semibold mb-1 md:mb-2 text-xs sm:text-sm md:text-base">راه‌های ارتباطی</h3>
-              <div className="space-y-1 md:space-y-2">
-                <a 
-                  href="https://wa.me/989123456789" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="text-white hover:text-green-300 transition-colors text-xs block"
-                >
-                  واتساپ پشتیبانی
-                </a>
-                <a 
-                  href="mailto:saironofficial@gmail.com" 
-                  className="text-white hover:text-blue-200 transition-colors text-xs block"
-                >
-                  saironofficial@gmail.com
-                </a>
+              <h3 className="font-semibold mb-1 md:mb-2 text-xs sm:text-sm md:text-base">واتساپ پشتیبانی</h3>
+              <a 
+                href="https://wa.me/989028430830" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-white hover:text-green-300 transition-colors font-mono text-xs sm:text-sm md:text-lg block"
+              >
+                ۰۹۰۲۸۴۳۰۸۳۰
+              </a>
+              <p className="text-blue-100 text-xs mt-1">پاسخگویی سریع</p>
+            </div>
+
+            {/* Email Support */}
+            <div className="bg-white/10 rounded-lg md:rounded-xl p-3 md:p-6 text-center backdrop-blur-sm">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 mx-auto mb-1 md:mb-3 bg-white/20 rounded-full flex items-center justify-center">
+                <svg className="w-4 h-4 sm:w-5 sm:w-5 md:w-6 md:h-6" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+                </svg>
               </div>
+              <h3 className="font-semibold mb-1 md:mb-2 text-xs sm:text-sm md:text-base">ایمیل پشتیبانی</h3>
+              <a 
+                href="mailto:saironstore.ir@gmail.com" 
+                className="text-white hover:text-blue-200 transition-colors text-xs sm:text-sm block break-all"
+              >
+                saironstore.ir@gmail.com
+              </a>
+              <p className="text-blue-100 text-xs mt-1">پاسخ در ۲۴ ساعت</p>
             </div>
           </div>
 
           {/* Quick Actions */}
           <div className="flex flex-col sm:flex-row justify-center items-center gap-2 md:gap-4 mt-4 md:mt-8">
             <a
-              href="tel:02123456789"
+              href="tel:09028430830"
               className="bg-white text-blue-600 px-4 py-2 md:px-8 md:py-3 rounded-full font-semibold hover:bg-gray-100 transition-all duration-300 flex items-center justify-center gap-1 md:gap-2 shadow-md md:shadow-lg hover:shadow-lg md:hover:shadow-xl w-full sm:w-auto text-xs md:text-base"
             >
               <svg className="w-3 h-3 md:w-5 md:h-5" fill="currentColor" viewBox="0 0 24 24">
@@ -157,7 +150,7 @@ const SupportInfo = () => {
               تماس سریع
             </a>
             <a
-              href="https://wa.me/989123456789"
+              href="https://wa.me/989028430830"
               target="_blank"
               rel="noopener noreferrer"
               className="bg-green-500 text-white px-4 py-2 md:px-8 md:py-3 rounded-full font-semibold hover:bg-green-600 transition-all duration-300 flex items-center justify-center gap-1 md:gap-2 shadow-md md:shadow-lg hover:shadow-lg md:hover:shadow-xl w-full sm:w-auto text-xs md:text-base"
@@ -168,6 +161,14 @@ const SupportInfo = () => {
               پیام در واتساپ
             </a>
           </div>
+
+          {/* Additional Info */}
+          {/* <div className="text-center mt-4 md:mt-6">
+            <p className="text-blue-100 text-xs md:text-sm">
+              🕐 ساعت کاری: ۹:۰۰ الی ۲۱:۰۰ - 
+              📞 تلفن: ۰۹۰۲۸۴۳۰۸۳۰
+            </p>
+          </div> */}
         </div>
       </div>
     </section>

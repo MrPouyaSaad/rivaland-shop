@@ -34,7 +34,6 @@ export default function ProductsPageContent() {
     try {
       const response = await userApiService.getCategories();
       
-      // پردازش پاسخ‌های مختلف
       if (response.success) {
         setCategories(response.data || response.categories || []);
       } else if (Array.isArray(response)) {
@@ -56,7 +55,6 @@ export default function ProductsPageContent() {
     }
 
     try {
-      // استفاده از سرویس موجود برای دریافت اطلاعات دسته‌بندی
       const categories = await userApiService.getCategories();
       const category = Array.isArray(categories) 
         ? categories.find(cat => cat.id === categoryId || cat._id === categoryId)
@@ -69,7 +67,7 @@ export default function ProductsPageContent() {
     }
   };
 
-  // دریافت محصولات با استفاده از سرویس API شما
+  // دریافت محصولات - با پشتیبانی از واریانت‌ها
   const fetchProducts = async () => {
     try {
       setLoading(true);
@@ -87,7 +85,7 @@ export default function ProductsPageContent() {
         response = await userApiService.getAllProducts(currentPage, 12);
       }
       
-      // پردازش پاسخ با فرمت سرویس شما
+      // پردازش پاسخ
       let productsData = [];
       let paginationInfo = {
         totalPages: 1,
@@ -95,98 +93,94 @@ export default function ProductsPageContent() {
         currentPage: currentPage
       };
 
-      // بررسی ساختار پاسخ
-if (response.success) {
-  // اگر data خودش آرایه محصولات است
-  if (Array.isArray(response.data)) {
-    productsData = response.data;
-    paginationInfo = {
-      totalPages: response.pagination?.totalPages || 1,
-      total: response.pagination?.total || response.data.length,
-      currentPage: response.pagination?.page || currentPage
-    };
-  } 
-  // اگر data یک آبجکت شامل products است
-  else if (response.data?.products) {
-    productsData = response.data.products;
-    paginationInfo = {
-      totalPages: response.data.pagination?.totalPages || 1,
-      total: response.data.pagination?.total || response.data.products.length,
-      currentPage: response.data.pagination?.page || currentPage
-    };
-  } 
-  // سایر حالت‌ها
-  else {
-    productsData = response.data || response.products || [];
-    paginationInfo = {
-      totalPages: response.data?.pagination?.totalPages || 1,
-      total: response.data?.pagination?.total || productsData.length,
-      currentPage: response.data?.pagination?.page || currentPage
-    };
-  }
-}
+      if (response.success) {
+        if (Array.isArray(response.data)) {
+          productsData = response.data;
+          paginationInfo = {
+            totalPages: response.pagination?.totalPages || 1,
+            total: response.pagination?.total || response.data.length,
+            currentPage: response.pagination?.page || currentPage
+          };
+        } else if (response.data?.products) {
+          productsData = response.data.products;
+          paginationInfo = {
+            totalPages: response.data.pagination?.totalPages || 1,
+            total: response.data.pagination?.total || response.data.products.length,
+            currentPage: response.data.pagination?.page || currentPage
+          };
+        } else {
+          productsData = response.data || response.products || [];
+          paginationInfo = {
+            totalPages: response.data?.pagination?.totalPages || 1,
+            total: response.data?.pagination?.total || productsData.length,
+            currentPage: response.data?.pagination?.page || currentPage
+          };
+        }
+      }
 
-      
-     // پردازش محصولات برای نمایش
-const processedProducts = productsData.map((product) => {
-  // قیمت اصلی
-  const originalPrice = product.price || 0;
-  let finalPrice = originalPrice;
-  let discountPercent = 0;
-  let hasDiscount = false;
+      // پردازش محصولات با پشتیبانی از واریانت‌ها
+      const processedProducts = productsData.map((product) => {
+        // پیدا کردن تصویر اصلی یا پیش‌فرض
+        let mainImage = "https://placehold.co/300x300/f3f4f6/000?text=Product+Image";
+        if (product.image) {
+          mainImage = product.image;
+        } else if (product.images && product.images.length > 0) {
+          const mainImg = product.images.find((img) => img.isMain) || product.images[0];
+          mainImage = typeof mainImg === "string" ? mainImg : mainImg.url;
+        }
 
-  // محاسبه تخفیف
-  if (product.discount && product.discount > 0) {
-    hasDiscount = true;
-    if (product.discountType === "percent") {
-      discountPercent = product.discount;
-      finalPrice = Math.round(originalPrice - (originalPrice * discountPercent) / 100);
-    } else if (product.discountType === "amount") {
-      discountPercent = Math.round((product.discount / originalPrice) * 100);
-      finalPrice = Math.max(originalPrice - product.discount, 0);
-    }
-  }
+        // پردازش واریانت‌ها
+        const variants = product.variants || [];
+        const hasVariants = product.hasVariants && variants.length > 0;
+        
+        // محاسبه کمترین و بیشترین قیمت
+        let minPrice = product.price || 0;
+        let maxPrice = product.price || 0;
+        
+        if (hasVariants && variants.length > 0) {
+          const variantPrices = variants.map(v => v.price).filter(price => price > 0);
+          if (variantPrices.length > 0) {
+            minPrice = Math.min(...variantPrices);
+            maxPrice = Math.max(...variantPrices);
+          }
+        }
 
-  // پیدا کردن تصویر اصلی یا پیش‌فرض
-  let mainImage = "https://placehold.co/300x300/f3f4f6/000?text=Product+Image";
-  if (product.image) {
-    mainImage = product.image;
-  } else if (product.images && product.images.length > 0) {
-    const mainImg = product.images.find((img) => img.isMain) || product.images[0];
-    mainImage = typeof mainImg === "string" ? mainImg : mainImg.url;
-  }
+        // استخراج ویژگی‌های واریانت
+        const variantAttributes = product.variantAttributes || {};
+        const availableVariants = product.availableVariants || variants.length;
 
-  // لیبل‌ها (پرفروش، پیشنهادی و ...)
-  const labels = product.labels || [];
+        return {
+          id: product.id || product._id,
+          name: product.name || product.title,
+          price: product.price || 0,
+          image: mainImage,
+          images: product.images || [],
+          labels: product.labels || [],
+          isNew: product.isNew || false,
+          isBestseller: product.isBestseller || false,
+          isFastDelivery: product.isFastDelivery || false,
+          discount: product.discount || 0,
+          discountType: product.discountType,
+          stock: product.stock || 0,
+          isInStock: product.isInStock !== false,
+          
+          // فیلدهای جدید برای واریانت‌ها
+          hasVariants: hasVariants,
+          variants: variants,
+          minPrice: minPrice,
+          maxPrice: maxPrice,
+          variantAttributes: variantAttributes,
+          availableVariants: availableVariants,
+          
+          // سایر فیلدها
+          createdAt: product.createdAt,
+          description: product.description,
+          category: product.category,
+          attributes: product.attributes || []
+        };
+      });
 
-  return {
-    id: product.id || product._id,
-    name: product.name || product.title, // 👈 حالا ProductCard درست کار می‌کنه
-    price: finalPrice,                   // قیمت نهایی بعد از تخفیف
-    originalPrice: originalPrice,        // قیمت اصلی قبل از تخفیف
-    image: mainImage,                    // تصویر اصلی
-    images: product.images || [],        // 👈 اضافه شد برای سازگاری با ProductCard
-    labels: labels,                      // 👈 اضافه شد برای نمایش badgeها
-    isNew:
-      product.isNew ||
-      (product.createdAt &&
-        new Date() - new Date(product.createdAt) <
-          30 * 24 * 60 * 60 * 1000),
-    isBestseller:
-      product.isBestseller ||
-      labels.some(
-        (l) =>
-          l.label?.name === "bestseller" || l.label?.title === "پرفروش"
-      ),
-    isFastDelivery: product.isFastDelivery || false,
-    discount: discountPercent,           // درصد تخفیف
-    hasDiscount: hasDiscount,
-    discountType: product.discountType,
-    originalDiscount: product.discount,
-  };
-});
-
-        console.log("🧩 processedProducts:", processedProducts);
+      console.log("🧩 Processed products with variants:", processedProducts);
       
       setProducts(processedProducts);
       setTotalPages(paginationInfo.totalPages);

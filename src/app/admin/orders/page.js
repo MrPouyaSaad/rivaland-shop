@@ -34,29 +34,25 @@ const OrdersPage = () => {
     try {
       setLoading(true);
       setError('');
-      
+
       const filters = {
         page,
         limit: pagination.limit
       };
-      
-      if (statusFilter !== 'all') {
-        filters.status = statusFilter;
-      }
-      
-      if (searchTerm) {
-        filters.search = searchTerm;
-      }
-      
+
+      if (statusFilter !== 'all') filters.status = statusFilter;
+      if (searchTerm) filters.search = searchTerm;
+      if (dateFilter !== 'all') filters.date = dateFilter;
+
       const response = await adminApiService.getAdminOrders(filters);
-      
+
       if (response.success) {
         setOrders(response.data.orders || []);
         setPagination(prev => ({
           ...prev,
           page,
           total: response.data.total || 0,
-          totalPages: response.data.totalPages || 0
+          totalPages: response.data.pagination?.totalPages || response.data.totalPages || 0
         }));
       } else {
         throw new Error(response.message || 'خطا در دریافت سفارشات');
@@ -75,7 +71,17 @@ const OrdersPage = () => {
     try {
       const response = await adminApiService.getAdminOrderStats();
       if (response.success) {
-        setStats(response.data || {});
+        // تبدیل آمار از فرمت آرایه به آبجکت
+        const statsObj = {};
+        if (response.data.stats && Array.isArray(response.data.stats)) {
+          response.data.stats.forEach(stat => {
+            statsObj[stat.status] = stat._count?.status || 0;
+          });
+        }
+        setStats({
+          ...statsObj,
+          total: response.data.total || 0
+        });
       }
     } catch (error) {
       console.error('Error fetching order stats:', error);
@@ -85,30 +91,53 @@ const OrdersPage = () => {
   useEffect(() => {
     fetchOrders(1);
     fetchOrderStats();
-  }, [statusFilter]);
+  }, [statusFilter, dateFilter]);
 
-  // جستجو با تاخیر
+  // جستجوی با debounce
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      if (searchTerm !== '' || statusFilter !== 'all') {
-        fetchOrders(1);
-      }
+      fetchOrders(1);
     }, 500);
 
     return () => clearTimeout(timeoutId);
-  }, [searchTerm, statusFilter]);
+  }, [searchTerm]);
 
-  // فیلتر کردن سفارشات
-  const filteredOrders = orders.filter(order => {
-    const matchesSearch = 
-      order.id?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      order.customerName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      order.customerPhone?.includes(searchTerm);
+  // نمایش نام مشتری
+  const getCustomerName = (order) => {
+    // اول از آدرس بگیر
+    if (order.address?.receiver) {
+      return order.address.receiver;
+    }
     
-    return matchesSearch;
-  });
+    // سپس از کاربر
+    if (order.user?.firstName || order.user?.lastName) {
+      return `${order.user.firstName || ''} ${order.user.lastName || ''}`.trim();
+    }
+    
+    // اگر هیچکدام نبود، از یوزرنیم استفاده کن
+    if (order.user?.username) {
+      return order.user.username;
+    }
+    
+    return 'نامشخص';
+  };
 
-  // تابع برای دریافت کلاس وضعیت سفارش
+  // نمایش شماره تلفن مشتری
+  const getCustomerPhone = (order) => {
+    // اول از آدرس بگیر
+    if (order.address?.phone) {
+      return order.address.phone;
+    }
+    
+    // سپس از کاربر
+    if (order.user?.phone) {
+      return order.user.phone;
+    }
+    
+    return 'شماره نامشخص';
+  };
+
+  // کلاس وضعیت سفارش
   const getStatusClass = (status) => {
     const statusMap = {
       pending_payment: 'bg-yellow-100 text-yellow-800',
@@ -122,7 +151,7 @@ const OrdersPage = () => {
     return statusMap[status] || 'bg-gray-100 text-gray-800';
   };
 
-  // تابع برای دریافت متن وضعیت سفارش
+  // متن وضعیت سفارش
   const getStatusText = (status) => {
     const statusMap = {
       pending_payment: 'در انتظار پرداخت',
@@ -137,9 +166,7 @@ const OrdersPage = () => {
   };
 
   // مشاهده جزئیات سفارش
-  const viewOrderDetails = (orderId) => {
-    router.push(`/admin/orders/${orderId}`);
-  };
+  const viewOrderDetails = (orderId) => router.push(`/admin/orders/${orderId}`);
 
   // تغییر صفحه
   const handlePageChange = (newPage) => {
@@ -160,8 +187,11 @@ const OrdersPage = () => {
   };
 
   // فرمت قیمت
-  const formatPrice = (price) => {
-    return price ? price.toLocaleString('fa-IR') + ' تومان' : '۰ تومان';
+  const formatPrice = (price) => price ? price.toLocaleString('fa-IR') + ' تومان' : '۰ تومان';
+
+  // محاسبه تعداد سفارشات در حال انجام
+  const getProcessingOrdersCount = () => {
+    return (stats.paid || 0) + (stats.processing || 0) + (stats.preparing || 0) + (stats.shipped || 0);
   };
 
   return (
@@ -281,9 +311,7 @@ const OrdersPage = () => {
         
         <div className="bg-white p-4 rounded-lg shadow">
           <div className="text-sm text-gray-500">در حال انجام</div>
-          <div className="text-2xl font-bold text-blue-600">
-            {(stats.paid || 0) + (stats.processing || 0) + (stats.preparing || 0) + (stats.shipped || 0)}
-          </div>
+          <div className="text-2xl font-bold text-blue-600">{getProcessingOrdersCount()}</div>
         </div>
         
         <div className="bg-white p-4 rounded-lg shadow">
@@ -319,16 +347,16 @@ const OrdersPage = () => {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {filteredOrders.length > 0 ? (
-                    filteredOrders.map((order) => (
+                  {orders.length > 0 ? (
+                    orders.map((order) => (
                       <tr key={order.id} className="hover:bg-gray-50">
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="text-sm font-medium text-gray-900">#{order.id}</div>
                           <div className="text-xs text-gray-500">{order.items?.length || 0} کالا</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">{order.customerName || 'نامشخص'}</div>
-                          <div className="text-xs text-gray-500">{order.customerPhone || 'شماره نامشخص'}</div>
+                          <div className="text-sm text-gray-900">{getCustomerName(order)}</div>
+                          <div className="text-xs text-gray-500">{getCustomerPhone(order)}</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="text-sm text-gray-500">{formatDate(order.createdAt)}</div>

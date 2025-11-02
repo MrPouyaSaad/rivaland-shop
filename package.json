@@ -1,5 +1,5 @@
 {
-  "name": "rivaland-shop",
+  "name": "sairon_store",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -10,12 +10,14 @@
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
+    "axios": "^1.12.2",
     "framer-motion": "^12.23.12",
     "iran-cities-json": "^2.0.0",
     "lucide-react": "^0.543.0",
     "next": "15.5.2",
     "react": "19.1.0",
     "react-dom": "19.1.0",
+    "react-hot-toast": "^2.6.0",
     "react-select": "^5.10.2",
     "recharts": "^3.1.2",
     "tailwindcss-rtl": "^0.9.0"

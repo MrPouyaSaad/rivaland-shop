@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/navigation';
-import { userApiService  } from '@/services/api';
+import { userApiService } from '@/services/api';
 import Image from 'next/image';
 
 export default function AuthPage() {
@@ -17,16 +17,46 @@ export default function AuthPage() {
   const router = useRouter();
   const inputRefs = useRef([]);
 
+  // ذخیره آدرس صفحه قبلی هنگام لود صفحه لاگین
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const previousPage = document.referrer;
+      const currentDomain = window.location.origin;
+      
+      // اگر از دامنه خودمان آمده‌ایم (نه از سایت دیگر یا رفرش صفحه)
+      if (previousPage && previousPage.startsWith(currentDomain)) {
+        const previousPath = previousPage.replace(currentDomain, '');
+        
+        // صفحاتی که نمی‌خواهیم بعد از لاگین به آنها برگردیم
+        const excludedPages = [
+          '/',
+          '/auth',
+          '/profile',
+          '/logout',
+          '/login'
+        ];
+        
+        const shouldExclude = excludedPages.some(page => 
+          previousPath === page || previousPath.startsWith(page + '/')
+        );
+        
+        if (!shouldExclude) {
+          localStorage.setItem('loginRedirect', previousPath);
+          console.log('📌 آدرس ذخیره شد برای بازگشت:', previousPath);
+        } else {
+          // اگر از صفحه excluded اومده، آدرس رو پاک کن
+          localStorage.removeItem('loginRedirect');
+        }
+      }
+    }
+  }, []);
+
   // تابع برای استانداردسازی شماره تلفن
   const standardizePhoneNumber = (phone) => {
-    // حذف همه کاراکترهای غیرعددی
     const cleaned = phone.replace(/\D/g, '');
-    
-    // اگر شماره با 0 شروع شده باشد، 0 اول را حذف می‌کنیم
     if (cleaned.startsWith('0')) {
       return cleaned.substring(1);
     }
-    
     return cleaned;
   };
 
@@ -43,100 +73,151 @@ export default function AuthPage() {
   }, [countdown]);
 
   const calculateTimeout = () => {
-    if (resendCount < 2) return 120; // 2 دقیقه برای 2 بار اول
-    if (resendCount < 4) return 300; // 5 دقیقه برای 2 بار بعدی
-    return 600; // 10 دقیقه برای بار پنجم به بعد
+    if (resendCount < 2) return 120;
+    if (resendCount < 4) return 300;
+    return 600;
   };
 
+  const validatePhoneNumber = (phone) => {
+    const standardizedPhone = standardizePhoneNumber(phone);
+    if (standardizedPhone.length !== 10) {
+      throw new Error('شماره تلفن باید 10 رقم باشد (بدون پیش‌شماره)');
+    }
+    if (!/^9\d{9}$/.test(standardizedPhone)) {
+      throw new Error('شماره تلفن باید با 9 شروع شود');
+    }
+    return standardizedPhone;
+  };
+
+  // ارسال کد تأیید
   const handleSendCode = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     setMessage('');
 
     try {
-      // استانداردسازی شماره تلفن قبل از ارسال
-      const standardizedPhone = standardizePhoneNumber(phoneNumber);
-      
-      // اعتبارسنجی شماره تلفن
-      if (standardizedPhone.length !== 10) {
-        throw new Error('شماره تلفن باید 10 رقم باشد');
+      const standardizedPhone = validatePhoneNumber(phoneNumber);
+      const formattedPhone = `98${standardizedPhone}`;
+
+      console.log("📨 درخواست ارسال کد:", formattedPhone);
+
+      const result = await userApiService.sendCode(formattedPhone);
+
+      if (!result?.success) {
+        throw new Error(result?.message || "ارسال کد با خطا مواجه شد");
       }
 
-      await userApiService.sendCode(standardizedPhone);
+      console.log("✅ ارسال کد موفق:", result);
+
       setStep(2);
       setResendCount(prev => prev + 1);
       setCountdown(calculateTimeout());
       setMessage('کد تأیید با موفقیت ارسال شد');
-      
-      // پاک کردن کدهای قبلی
       setVerificationCode(['', '', '', '', '']);
-      
-      // فوکوس روی اولین فیلد کد
+
       setTimeout(() => {
-        if (inputRefs.current[0]) {
-          inputRefs.current[0].focus();
-        }
+        inputRefs.current[0]?.focus();
       }, 100);
     } catch (error) {
-      console.error('ارسال کد ناموفق بود:', error);
-      setMessage(error.message || 'خطا در ارسال کد، لطفاً دوباره تلاش کنید');
+      console.error("❌ خطا در ارسال کد:", error);
+      setMessage(error.message || "خطا در ارسال کد، لطفاً دوباره تلاش کنید");
     } finally {
       setIsLoading(false);
     }
   };
 
+  // تأیید کد - با قابلیت بازگشت به صفحه قبلی
   const handleVerifyCode = async (e) => {
     e.preventDefault();
+    const code = verificationCode.join('');
+
+    if (code.length !== 5) {
+      setMessage('کد باید ۵ رقم باشد');
+      return;
+    }
+
     setIsLoading(true);
     setMessage('');
 
     try {
-      const code = verificationCode.join('');
-      // استانداردسازی شماره تلفن قبل از ارسال برای تأیید
-      const standardizedPhone = standardizePhoneNumber(phoneNumber);
-      
-      const result = await userApiService.verifyCode(standardizedPhone, code);
-      console.log('ورود موفق:', result);
-      router.push('/');
+      const standardizedPhone = validatePhoneNumber(phoneNumber);
+      const formattedPhone = `98${standardizedPhone}`;
+
+      console.log("🧩 ارسال برای وریفای:", { formattedPhone, code });
+
+      const result = await userApiService.verifyCode(formattedPhone, code);
+
+      console.log("🔍 پاسخ سرور:", result);
+
+      if (!result || !result.token) {
+        throw new Error(result?.message || "کد اشتباه یا منقضی شده است");
+      }
+
+      setMessage('✅ ورود موفقیت‌آمیز! در حال انتقال...');
+      localStorage.setItem('authToken', result.token);
+
+      // هدایت به صفحه قبلی یا صفحه اصلی
+      setTimeout(() => {
+        const redirectUrl = localStorage.getItem('loginRedirect');
+        localStorage.removeItem('loginRedirect'); // همیشه پاک کن بعد از استفاده
+        
+        // اعتبارسنجی نهایی - فقط به صفحات مجاز برگرد
+        if (redirectUrl && 
+            !redirectUrl.includes('/auth') &&
+            !redirectUrl.includes('/profile') &&
+            !redirectUrl.includes('/logout') &&
+            !redirectUrl.includes('/login')) {
+          console.log('↩️ بازگشت به صفحه قبلی:', redirectUrl);
+          router.push(redirectUrl);
+        } else {
+          console.log('🏠 هدایت به صفحه اصلی');
+          router.push('/');
+        }
+      }, 1000);
     } catch (error) {
-      console.error('کد اشتباه است:', error);
-      setMessage('کد وارد شده صحیح نیست');
+      console.error("❌ خطا در وریفای:", error);
+      setMessage(error.message || "کد وارد شده اشتباه است یا منقضی شده");
+      setVerificationCode(['', '', '', '', '']);
+      inputRefs.current[0]?.focus();
     } finally {
       setIsLoading(false);
     }
   };
 
+  // ارسال مجدد کد
   const handleResendCode = async () => {
-    if (countdown > 0) return;
-    
+    if (countdown > 0 || isLoading) return;
+
     setIsLoading(true);
     setMessage('');
 
     try {
-      // استانداردسازی شماره تلفن قبل از ارسال مجدد
-      const standardizedPhone = standardizePhoneNumber(phoneNumber);
-      
-      await userApiService.sendCode(standardizedPhone);
+      const standardizedPhone = validatePhoneNumber(phoneNumber);
+      const formattedPhone = `98${standardizedPhone}`;
+
+      console.log("🔁 درخواست ارسال مجدد:", formattedPhone);
+
+      const result = await userApiService.sendCode(formattedPhone);
+
+      if (!result?.success) {
+        throw new Error(result?.message || "ارسال مجدد کد با خطا مواجه شد");
+      }
+
+      console.log("✅ ارسال مجدد موفق:", result);
+
       setResendCount(prev => prev + 1);
       setCountdown(calculateTimeout());
       setMessage('کد جدید ارسال شد');
-      
-      // پاک کردن کدهای قبلی
       setVerificationCode(['', '', '', '', '']);
-      
-      // فوکوس روی اولین فیلد کد
-      if (inputRefs.current[0]) {
-        inputRefs.current[0].focus();
-      }
+      inputRefs.current[0]?.focus();
     } catch (error) {
-      console.error('ارسال مجدد کد ناموفق بود:', error);
-      setMessage('خطا در ارسال کد، لطفاً دوباره تلاش کنید');
+      console.error("❌ خطا در ارسال مجدد:", error);
+      setMessage(error.message || "خطا در ارسال مجدد کد، لطفاً دوباره تلاش کنید");
     } finally {
       setIsLoading(false);
     }
   };
 
-  // تابع برای فرمت کردن شماره تلفن در نمایش
   const formatPhoneNumber = (phone) => {
     const cleaned = phone.replace(/\D/g, '');
     if (cleaned.length <= 3) {
@@ -151,14 +232,16 @@ export default function AuthPage() {
 
   const handlePhoneChange = (e) => {
     const value = e.target.value;
-    // فقط اعداد و فاصله مجاز
     const cleaned = value.replace(/[^\d\s]/g, '');
     setPhoneNumber(cleaned);
+    // پاک کردن پیام وقتی کاربر در حال تایپ است
+    if (message) setMessage('');
   };
 
   const handleBackToPhone = () => {
     setStep(1);
     setMessage('');
+    setVerificationCode(['', '', '', '', '']);
   };
 
   const handleCodeInput = (e, index) => {
@@ -167,6 +250,9 @@ export default function AuthPage() {
       const newCode = [...verificationCode];
       newCode[index] = value;
       setVerificationCode(newCode);
+      
+      // پاک کردن پیام وقتی کاربر در حال تایپ است
+      if (message) setMessage('');
       
       if (value !== '' && index < 4) {
         const nextInput = inputRefs.current[index + 1];
@@ -195,6 +281,10 @@ export default function AuthPage() {
       if (inputRefs.current[4]) {
         inputRefs.current[4].focus();
       }
+      // پاک کردن پیام وقتی کاربر پیست می‌کند
+      if (message) setMessage('');
+    } else {
+      setMessage('کد باید دقیقاً ۵ رقم باشد');
     }
   };
 
@@ -218,12 +308,10 @@ export default function AuthPage() {
         <title>ســایـرون | ورود و ثبت‌نام</title>
         <meta name="description" content="ورود و ثبت‌نام در ســایـرون" />
         <link rel="icon" href="/favicon.ico" />
-        {/* اصلاح viewport برای غیرفعال کردن زوم */}
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
       </Head>
 
       <style jsx global>{`
-        /* غیرفعال کردن زوم در موبایل */
         * {
           -webkit-touch-callout: none;
           -webkit-user-select: none;
@@ -240,10 +328,9 @@ export default function AuthPage() {
           -moz-user-select: text;
           -ms-user-select: text;
           user-select: text;
-          font-size: 16px !important; /* جلوگیری از زوم خودکار در iOS */
+          font-size: 16px !important;
         }
         
-        /* جلوگیری از زوم با دبل تاپ */
         html {
           touch-action: manipulation;
         }
@@ -256,11 +343,11 @@ export default function AuthPage() {
       `}</style>
 
       <div className="min-h-screen bg-gradient-to-br from-purple-50 to-indigo-50 overflow-hidden relative">
-        {/* دکوراسیون پس‌زمینه - کوچک‌تر برای موبایل */}
+        {/* دکوراسیون پس‌زمینه */}
         <div className="absolute top-0 right-0 w-60 h-60 bg-purple-200 rounded-full filter blur-3xl opacity-40"></div>
         <div className="absolute bottom-0 left-0 w-72 h-72 bg-indigo-200 rounded-full filter blur-3xl opacity-40"></div>
         
-        {/* لوگوی بزرگ انگلیسی و فارسی در پس‌زمینه - کوچک‌تر برای موبایل */}
+        {/* لوگوی بزرگ انگلیسی و فارسی در پس‌زمینه */}
         <div className="absolute inset-0 flex items-center justify-center opacity-5">
           <div className="text-center">
             <div className="text-6xl md:text-[180px] font-black text-purple-500 mt-8 md:mt-[+60px]">S A I R O N</div>
@@ -272,7 +359,7 @@ export default function AuthPage() {
           <div className="w-full max-w-sm">
             {/* نمایش پیام */}
             {message && (
-              <div className={`mb-4 p-3 rounded-lg text-center text-sm ${message.includes('موفق') ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+              <div className={`mb-4 p-3 rounded-lg text-center text-sm ${message.includes('موفق') || message.includes('انتقال') ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
                 {message}
               </div>
             )}
@@ -319,8 +406,9 @@ export default function AuthPage() {
                         value={formatPhoneNumber(phoneNumber)}
                         onChange={handlePhoneChange}
                         required
-                        maxLength={12} // 3 فاصله + 10 رقم
+                        maxLength={12}
                         dir="ltr"
+                        disabled={isLoading}
                       />
                     </div>
                     <p className="text-xs text-gray-500 mt-2 text-right">
@@ -344,12 +432,7 @@ export default function AuthPage() {
                         در حال ارسال...
                       </span>
                     ) : (
-                      <span className="flex items-center justify-center">
-                        دریافت کد تأیید
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                        </svg>
-                      </span>
+                      'دریافت کد تأیید'
                     )}
                   </button>
                 </form>
@@ -363,12 +446,10 @@ export default function AuthPage() {
                       <button
                         type="button"
                         onClick={handleBackToPhone}
-                        className="text-purple-600 text-xs hover:text-purple-800 transition flex items-center"
+                        disabled={isLoading}
+                        className="text-purple-600 text-xs hover:text-purple-800 transition flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         تغییر شماره موبایل
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16l-4-4m0 0l4-4m-4 4h18" />
-                        </svg>
                       </button>
                     </div>
                     
@@ -387,6 +468,7 @@ export default function AuthPage() {
                           onPaste={handlePaste}
                           maxLength={1}
                           autoFocus={index === 0 && verificationCode.join('') === ''}
+                          disabled={isLoading}
                         />
                       ))}
                     </div>
@@ -412,31 +494,21 @@ export default function AuthPage() {
                         در حال بررسی...
                       </span>
                     ) : (
-                      <span className="flex items-center justify-center">
-                        ورود به حساب
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                        </svg>
-                      </span>
+                      'ورود به حساب'
                     )}
                   </button>
 
                   <div className="mt-4 text-center">
                     <button
                       type="button"
-                      disabled={countdown > 0}
-                      className={`text-xs transition flex items-center justify-center ${countdown > 0 ? 'text-gray-400 cursor-not-allowed' : 'text-purple-600 hover:text-purple-800'}`}
+                      disabled={countdown > 0 || isLoading}
+                      className={`text-xs transition flex items-center justify-center ${countdown > 0 || isLoading ? 'text-gray-400 cursor-not-allowed' : 'text-purple-600 hover:text-purple-800'}`}
                       onClick={handleResendCode}
                     >
                       {countdown > 0 ? (
-                        <span>ارسال مجدد پس از {formatTime(countdown)}</span>
+                        `ارسال مجدد پس از ${formatTime(countdown)}`
                       ) : (
-                        <>
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                          </svg>
-                          ارسال مجدد کد
-                        </>
+                        'ارسال مجدد کد'
                       )}
                     </button>
                   </div>
