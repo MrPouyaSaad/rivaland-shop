@@ -35,8 +35,9 @@ const ProductCard = ({ product }) => {
     hasDiscount = true;
   } else if (discountType === "amount" && discount > 0) {
     finalPrice = Math.max(0, minPrice - discount);
+    // محاسبه درصد تخفیف برای حالت مبلغی
     discountPercent = minPrice > 0 ? Math.round((discount / minPrice) * 100) : 0;
-    hasDiscount = true;
+    hasDiscount = discountPercent > 0;
   }
 
   // --- تصویر محصول ---
@@ -100,12 +101,10 @@ const ProductCard = ({ product }) => {
       <div className="relative w-full aspect-square p-4 bg-white">
         {renderBadge()}
 
-        {/* ✅ نشان تخفیف روی تصویر */}
+        {/* ✅ نشان تخفیف روی تصویر - همیشه درصد نمایش داده می‌شود */}
         {hasDiscount && (
           <span className="absolute top-2 left-2 bg-gradient-to-r from-red-500 to-pink-700 text-white text-xs font-bold px-2 py-1 rounded-full z-10 shadow-lg">
-            {discountType === "percent"
-              ? `${discountPercent}%`
-              : `-${discount.toLocaleString()} تومان`}
+            {discountPercent}% تخفیف
           </span>
         )}
 
@@ -152,13 +151,6 @@ const ProductCard = ({ product }) => {
                 }`}>
                   {finalPrice.toLocaleString()} تومان
                 </p>
-                
-                {/* نشانگر "از" برای محصولات با واریانت */}
-                {/* {hasVariants && (
-                  <span className="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded-full">
-                    از {finalPrice.toLocaleString()}
-                  </span>
-                )} */}
               </div>
 
               {/* ✅ قیمت اصلی (خط‌خورده) */}

@@ -54,26 +54,21 @@ const ProfilePage = () => {
     nationalCode: ''
   });
 
+  // تغییر در state مربوط به آدرس - اضافه کردن provinceId و cityId
   const [addressForm, setAddressForm] = useState({
     title: '',
     receiver: '',
     phone: '',
     province: '',
+    provinceId: '',
     city: '',
+    cityId: '',
     address: '',
     postalCode: '',
     isDefault: false
   });
 
-  // استان‌های ایران
-  const provinces = [
-    'تهران', 'البرز', 'اصفهان', 'فارس', 'خراسان رضوی', 'آذربایجان شرقی',
-    'آذربایجان غربی', 'کرمان', 'خوزستان', 'قم', 'مرکزی', 'گیلان',
-    'مازندران', 'هرمزگان', 'سیستان و بلوچستان', 'کردستان', 'لرستان',
-    'همدان', 'یزد', 'کرمانشاه', 'اردبیل', 'زنجان', 'سمنان', 'چهارمحال و بختیاری',
-    'کهگیلویه و بویراحمد', 'گلستان', 'ایلام', 'بوشهر', 'خراسان شمالی',
-    'خراسان جنوبی'
-  ];
+  // حذف لیست استان‌های ثابت - چون از iran-cities-json استفاده می‌کنیم
 
   // Helper Functions
   const getOrderSteps = (order) => {
@@ -96,8 +91,6 @@ const ProfilePage = () => {
         };
       });
     }
-
-
 
     const steps = [
       { 
@@ -227,43 +220,43 @@ const ProfilePage = () => {
     }));
   };
 
-      const handleStatusFilter = async (status) => {
-  setActiveFilter(status);
-  await fetchActiveOrders(status);
-};
+  const handleStatusFilter = async (status) => {
+    setActiveFilter(status);
+    await fetchActiveOrders(status);
+  };
 
   // API Functions
-const fetchActiveOrders = async (filter = 'all') => {
-  try {
-    setActiveOrdersFilter(filter);
-    setError('activeOrders', null);
-    
-    const response = await userApiService.getUserOrders();
-    
-    if (response.success) {
-      let orders = response.data.orders || [];
+  const fetchActiveOrders = async (filter = 'all') => {
+    try {
+      setActiveOrdersFilter(filter);
+      setError('activeOrders', null);
       
-      // فیلتر کردن سفارش‌ها بر اساس وضعیت
-      if (filter === 'active') {
-        // سفارش‌های فعال: همه به جز تحویل شده و لغو شده
-        orders = orders.filter(order => 
-          !['delivered', 'cancelled'].includes(order.status)
-        );
-      } else if (filter !== 'all') {
-        // فیلتر بر اساس وضعیت خاص
-        orders = orders.filter(order => order.status === filter);
+      const response = await userApiService.getUserOrders();
+      
+      if (response.success) {
+        let orders = response.data.orders || [];
+        
+        // فیلتر کردن سفارش‌ها بر اساس وضعیت
+        if (filter === 'active') {
+          // سفارش‌های فعال: همه به جز تحویل شده و لغو شده
+          orders = orders.filter(order => 
+            !['delivered', 'cancelled'].includes(order.status)
+          );
+        } else if (filter !== 'all') {
+          // فیلتر بر اساس وضعیت خاص
+          orders = orders.filter(order => order.status === filter);
+        }
+        // اگر فیلتر 'all' باشد، همه سفارش‌ها نمایش داده می‌شوند
+        
+        setActiveOrders(orders);
+      } else {
+        throw new Error(response.message || 'خطا در دریافت سفارش‌ها');
       }
-      // اگر فیلتر 'all' باشد، همه سفارش‌ها نمایش داده می‌شوند
-      
-      setActiveOrders(orders);
-    } else {
-      throw new Error(response.message || 'خطا در دریافت سفارش‌ها');
+    } catch (error) {
+      console.error('Error fetching active orders:', error);
+      setError('activeOrders', 'خطا در دریافت سفارش‌های فعال');
     }
-  } catch (error) {
-    console.error('Error fetching active orders:', error);
-    setError('activeOrders', 'خطا در دریافت سفارش‌های فعال');
-  }
-};
+  };
 
   const fetchUserProfile = async () => {
     try {
@@ -297,21 +290,21 @@ const fetchActiveOrders = async (filter = 'all') => {
     }
   };
 
-// دریافت آدرس‌ها
-const fetchAddresses = async () => {
-  try {
-    setError('addresses', null);
-    const response = await userApiService.getUserAddresses();
-    if (response.success) {
-      setAddresses(response.data);
-    } else {
-      throw new Error(response.message || 'خطا در دریافت آدرس‌ها');
+  // دریافت آدرس‌ها
+  const fetchAddresses = async () => {
+    try {
+      setError('addresses', null);
+      const response = await userApiService.getUserAddresses();
+      if (response.success) {
+        setAddresses(response.data);
+      } else {
+        throw new Error(response.message || 'خطا در دریافت آدرس‌ها');
+      }
+    } catch (error) {
+      console.error('Error fetching addresses:', error);
+      setError('addresses', 'خطا در دریافت آدرس‌ها');
     }
-  } catch (error) {
-    console.error('Error fetching addresses:', error);
-    setError('addresses', 'خطا در دریافت آدرس‌ها');
-  }
-};
+  };
 
   const fetchOrderStats = async () => {
     try {
@@ -394,24 +387,24 @@ const fetchAddresses = async () => {
   };
 
   useEffect(() => {
-  const loadData = async () => {
-    setLoading(true);
-    try {
-      await fetchUserProfile();
-      await Promise.all([
-        fetchOrderStats(),
-        fetchActiveOrders('all'),
-        fetchAddresses() // اضافه کردن این خط
-      ]);
-    } catch (error) {
-      console.error('Error loading data:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+    const loadData = async () => {
+      setLoading(true);
+      try {
+        await fetchUserProfile();
+        await Promise.all([
+          fetchOrderStats(),
+          fetchActiveOrders('all'),
+          fetchAddresses()
+        ]);
+      } catch (error) {
+        console.error('Error loading data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  loadData();
-}, []);
+    loadData();
+  }, []);
 
   const handleAddressSubmit = async (e) => {
     e.preventDefault();
@@ -430,12 +423,15 @@ const fetchAddresses = async () => {
         await fetchAddresses();
         setShowAddressModal(false);
         setEditingAddress(null);
+        // ریست فرم به حالت اولیه با فیلدهای جدید
         setAddressForm({
           title: '',
           receiver: '',
           phone: '',
           province: '',
+          provinceId: '',
           city: '',
+          cityId: '',
           address: '',
           postalCode: '',
           isDefault: false
@@ -488,12 +484,15 @@ const fetchAddresses = async () => {
 
   const handleEditAddress = (address) => {
     setEditingAddress(address);
+    // تنظیم فرم با فیلدهای جدید provinceId و cityId
     setAddressForm({
       title: address.title,
       receiver: address.receiver,
       phone: address.phone,
       province: address.province,
+      provinceId: address.provinceId || '', // اضافه کردن provinceId
       city: address.city,
+      cityId: address.cityId || '', // اضافه کردن cityId
       address: address.address,
       postalCode: address.postalCode,
       isDefault: address.isDefault
@@ -503,12 +502,15 @@ const fetchAddresses = async () => {
 
   const handleNewAddress = () => {
     setEditingAddress(null);
+    // ریست فرم با فیلدهای جدید
     setAddressForm({
       title: '',
       receiver: '',
       phone: '',
       province: '',
+      provinceId: '',
       city: '',
+      cityId: '',
       address: '',
       postalCode: '',
       isDefault: false
@@ -550,27 +552,6 @@ const fetchAddresses = async () => {
     }
   };
 
-  useEffect(() => {
-    const loadData = async () => {
-      setLoading(true);
-      try {
-        await fetchUserProfile();
-        await Promise.all([
-          fetchOrderStats(),
-          fetchActiveOrders('active')
-        ]);
-      } catch (error) {
-        console.error('Error loading data:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadData();
-  }, []);
-
-  
-
   if (!user && errors.profile?.includes('USER_NOT_FOUND')) {
     return null;
   }
@@ -595,7 +576,6 @@ const fetchAddresses = async () => {
               orderStats={orderStats}
               addresses={addresses}
               handleLogout={handleLogout}
-              
             />
 
             {/* Main Content */}
@@ -605,11 +585,11 @@ const fetchAddresses = async () => {
               {activeTab === 'active-orders' && (
                 <>
                   <ProfileStats 
-  orderStats={orderStats} 
-  errors={errors}
-  onStatusFilter={handleStatusFilter}
-  activeFilter={activeFilter}
-/>
+                    orderStats={orderStats} 
+                    errors={errors}
+                    onStatusFilter={handleStatusFilter}
+                    activeFilter={activeFilter}
+                  />
                   
                   <ActiveOrders
                     activeOrders={activeOrders}
@@ -655,7 +635,7 @@ const fetchAddresses = async () => {
         </div>
       </div>
 
-      {/* Address Modal */}
+      {/* Address Modal - حذف prop provinces */}
       <AddressModal
         showAddressModal={showAddressModal}
         editingAddress={editingAddress}
@@ -665,7 +645,7 @@ const fetchAddresses = async () => {
         errors={errors}
         handleAddressSubmit={handleAddressSubmit}
         handleCloseAddressModal={handleCloseAddressModal}
-        provinces={provinces}
+        // حذف شده: provinces={provinces}
       />
     </Layout>
   );

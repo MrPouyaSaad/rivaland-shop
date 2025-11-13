@@ -16,7 +16,7 @@ const Footer = () => {
             "name": "فروشگاه اینترنتی سایرون",
             "url": "https://saironstore.ir",
             "logo": "https://saironstore.ir/sairon-logo.png",
-            "description": "فروشگاه اینترنتی سایرون - ارائه بهترین محصولات لوازم جانبی موبایل و کامپیوتر با کیفیت عالی و قیمت مناسب",
+            "description": "فروشگاه اینترنتی سایرون - ارائه بهترین محصولات با کیفیت عالی و قیمت مناسب",
             "address": {
               "@type": "PostalAddress",
               "streetAddress": "تبریز، ائلگلی، سینا، گلبرگ، پلاک صفر",
@@ -56,7 +56,7 @@ const Footer = () => {
                     <div className="relative w-8 h-8">
                       <Image
                         src="/sairon-logo.png"
-                        alt="لوگو فروشگاه اینترنتی سایرون - تخصص در لوازم جانبی موبایل و کامپیوتر"
+                        alt="لوگو فروشگاه اینترنتی سایرون"
                         fill
                         className="object-contain"
                         loading="lazy"
@@ -78,7 +78,7 @@ const Footer = () => {
               </div>
               
               <p className="text-gray-400 text-sm leading-relaxed" itemProp="description">
-                فروشگاه اینترنتی سایرون - ارائه بهترین محصولات لوازم جانبی موبایل و کامپیوتر با کیفیت عالی و قیمت مناسب
+                فروشگاه اینترنتی سایرون - ارائه بهترین محصولات با کیفیت عالی و قیمت مناسب
               </p>
               
               {/* Social Media */}
@@ -283,7 +283,7 @@ const Footer = () => {
                 عضویت در خبرنامه سایرون
               </h4>
               <p className="text-gray-400 text-xs md:text-sm mb-4">
-                جدیدترین تخفیف‌ها و محصولات لوازم جانبی موبایل و کامپیوتر را دریافت کنید
+                جدیدترین تخفیف‌ها و محصولات لوازم را دریافت کنید
               </p>
               <div className="flex flex-col space-y-3">
                 <input 
@@ -303,35 +303,22 @@ const Footer = () => {
               </div>
             </div>
 
-            {/* Trust Seals */}
-            <div className="bg-gray-800/50 rounded-xl md:rounded-2xl p-4 md:p-6 flex flex-col items-center justify-center">
-              <h4 className="font-semibold mb-3 md:mb-4 text-white text-base md:text-lg text-center">
-                گواهی اعتماد الکترونیکی
-              </h4>
-              <a
-                referrerPolicy="origin"
-                target="_blank"
-                href="https://trustseal.enamad.ir/?id=659468&Code=61cr3iUI3mHakXHdrhbGqY8BIddpdXLz"
-                title="نماد اعتماد الکترونیکی فروشگاه سایرون - معتبر از وزارت صنعت"
-                aria-label="نماد اعتماد الکترونیکی فروشگاه سایرون"
-                rel="noopener noreferrer"
-              >
-                <img
-                  referrerPolicy="origin"
-                  src="https://trustseal.enamad.ir/logo.aspx?id=659468&Code=61cr3iUI3mHakXHdrhbGqY8BIddpdXLz"
-                  alt="نماد اعتماد الکترونیکی فروشگاه اینترنتی سایرون - دارای مجوز از وزارت صنعت، معدن و تجارت"
-                  style={{ cursor: "pointer" }}
-                  code="61cr3iUI3mHakXHdrhbGqY8BIddpdXLz"
-                  className="max-w-full h-auto"
-                  loading="lazy"
-                  width="100"
-                  height="100"
-                />
-              </a>
-              <p className="text-gray-400 text-xs md:text-sm text-center mt-3 md:mt-4">
-                فروشگاه اینترنتی سایرون دارای نماد اعتماد الکترونیکی
-              </p>
-            </div>
+           <div className="bg-gray-800/50 rounded-xl md:rounded-2xl p-4 md:p-6 flex flex-col items-center justify-center">
+  <h4 className="font-semibold mb-3 md:mb-4 text-white text-base md:text-lg text-center">
+    گواهی اعتماد الکترونیکی
+  </h4>
+
+  <div
+    dangerouslySetInnerHTML={{
+      __html: `<a referrerpolicy='origin' target='_blank' href='https://trustseal.enamad.ir/?id=659468&Code=61cr3iUI3mHakXHdrhbGqY8BIddpdXLz'><img referrerpolicy='origin' src='https://trustseal.enamad.ir/logo.aspx?id=659468&Code=61cr3iUI3mHakXHdrhbGqY8BIddpdXLz' alt='نماد اعتماد الکترونیکی فروشگاه سایرون' style='cursor:pointer' code='61cr3iUI3mHakXHdrhbGqY8BIddpdXLz'></a>`,
+    }}
+  />
+
+  <p className="text-gray-400 text-xs md:text-sm text-center mt-3 md:mt-4">
+    فروشگاه اینترنتی سایرون دارای نماد اعتماد الکترونیکی
+  </p>
+</div>
+
 
           </div>
 
@@ -344,10 +331,7 @@ const Footer = () => {
                 <span itemProp="copyrightHolder"> فروشگاه اینترنتی سایرون</span>. کلیه حقوق محفوظ است.
               </div>
               
-              {/* Additional Info */}
-              <div className="text-gray-500 text-xs text-center md:text-left">
-                <span itemProp="description">تخصص در لوازم جانبی موبایل و کامپیوتر</span>
-              </div>
+             
             </div>
           </div>
 

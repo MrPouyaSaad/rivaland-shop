@@ -71,7 +71,7 @@ const ProductDetailPage = () => {
       };
     } else if (stock <= 10) {
       return {
-        text: `موجودیت محدود`,
+        text: `موجودی محدود`,
         class: 'bg-gradient-to-r from-blue-50 to-indigo-50 text-blue-700 border border-blue-200',
         urgency: 'medium',
         message: 'موجودی محدود'

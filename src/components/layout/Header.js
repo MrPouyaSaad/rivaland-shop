@@ -166,84 +166,88 @@ const Header = () => {
     // پخش event برای کامپوننت‌های دیگر
     window.dispatchEvent(new Event('authChange'));
     
-    // ریست کردن سبد خرید
     clearCart();
   };
 
-  // تابع برای نمایش آیکون/عکس دسته‌بندی
-  const getCategoryIcon = (category) => {
-    if (category.image) {
-      return (
-        <div className="relative w-8 h-8 md:w-10 md:h-10 rounded-full overflow-hidden">
-          <Image
-            src={category.image}
-            alt={`دسته‌بندی ${category.name} - فروشگاه اینترنتی سایرون`}
-            width={40}
-            height={40}
-            className="object-cover w-full h-full"
-            loading="lazy"
-            onError={(e) => {
-              e.target.style.display = 'none';
-              const fallback = e.target.parentNode.querySelector('.category-fallback');
-              if (fallback) fallback.style.display = 'flex';
-            }}
-          />
-          {/* فال‌بک برای زمانی که عکس لود نمی‌شود */}
-          <div 
-            className="category-fallback hidden w-full h-full items-center justify-center bg-gradient-to-r from-blue-500 to-purple-500 text-white text-xs font-bold"
-          >
-            {category.name ? category.name.charAt(0) : 'د'}
-          </div>
-        </div>
-      );
-    }
-    
-    // اگر عکس وجود ندارد، آیکون پیش‌فرض نمایش داده می‌شود
+const getCategoryIcon = (category) => {
+  if (category.image) {
     return (
-      <div className="relative w-8 h-8 md:w-10 md:h-10 rounded-full overflow-hidden">
-        <div className="w-full h-full bg-gradient-to-r from-gray-400 to-gray-600 flex items-center justify-center">
-          <svg className="w-4 h-4 md:w-5 md:h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-          </svg>
+      <div className="relative w-8 h-8 md:w-10 md:h-10 rounded-full overflow-hidden bg-gray-100">
+        <Image
+          src={category.image}
+          alt={`دسته‌بندی ${category.name} - فروشگاه اینترنتی سایرون`}
+          width={40}
+          height={40}
+          className="object-cover w-full h-full"
+          loading="lazy"
+          unoptimized={true} // غیرفعال کردن بهینه‌سازی برای تست
+          onError={(e) => {
+            console.log('Image failed to load:', category.image);
+            e.target.style.display = 'none';
+            const fallback = e.target.parentNode.querySelector('.category-fallback');
+            if (fallback) fallback.style.display = 'flex';
+          }}
+          onLoad={() => console.log('Image loaded successfully:', category.image)}
+        />
+        {/* فال‌بک برای زمانی که عکس لود نمی‌شود */}
+        <div 
+          className="category-fallback hidden w-full h-full items-center justify-center bg-gradient-to-r from-blue-500 to-purple-500 text-white text-xs font-bold"
+        >
+          {category.name ? category.name.charAt(0) : 'د'}
         </div>
       </div>
     );
-  };
-
-  const getMobileCategoryIcon = (category) => {
-    if (category.image) {
-      return (
-        <div className="relative w-8 h-8 rounded-full overflow-hidden">
-          <Image
-            src={category.image}
-            alt={`دسته‌بندی ${category.name} - فروشگاه اینترنتی سایرون`}
-            width={32}
-            height={32}
-            className="object-cover w-full h-full"
-            loading="lazy"
-            onError={(e) => {
-              e.target.style.display = 'none';
-              const fallback = e.target.parentNode.querySelector('.mobile-category-fallback');
-              if (fallback) fallback.style.display = 'flex';
-            }}
-          />
-          <div 
-            className="mobile-category-fallback hidden w-full h-full items-center justify-center bg-gradient-to-r from-blue-500 to-purple-500 text-white text-xs font-bold"
-          >
-            {category.name ? category.name.charAt(0) : 'د'}
-          </div>
-        </div>
-      );
-    };
-    
-    return (
-      <div className="w-8 h-8 bg-gradient-to-r from-gray-400 to-gray-600 rounded-full flex items-center justify-center">
-        <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+  }
+  
+  // اگر عکس وجود ندارد، آیکون پیش‌فرض نمایش داده می‌شود
+  return (
+    <div className="relative w-8 h-8 md:w-10 md:h-10 rounded-full overflow-hidden">
+      <div className="w-full h-full bg-gradient-to-r from-gray-400 to-gray-600 flex items-center justify-center">
+        <svg className="w-4 h-4 md:w-5 md:h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
         </svg>
       </div>
+    </div>
+  );
+};
+
+const getMobileCategoryIcon = (category) => {
+  if (category.image) {
+    return (
+      <div className="relative w-8 h-8 rounded-full overflow-hidden bg-gray-100">
+        <Image
+          src={category.image}
+          alt={`دسته‌بندی ${category.name} - فروشگاه اینترنتی سایرون`}
+          width={32}
+          height={32}
+          className="object-cover w-full h-full"
+          loading="lazy"
+          unoptimized={true}
+          onError={(e) => {
+            console.log('Mobile image failed to load:', category.image);
+            e.target.style.display = 'none';
+            const fallback = e.target.parentNode.querySelector('.mobile-category-fallback');
+            if (fallback) fallback.style.display = 'flex';
+          }}
+          onLoad={() => console.log('Mobile image loaded:', category.image)}
+        />
+        <div 
+          className="mobile-category-fallback hidden w-full h-full items-center justify-center bg-gradient-to-r from-blue-500 to-purple-500 text-white text-xs font-bold"
+        >
+          {category.name ? category.name.charAt(0) : 'د'}
+        </div>
+      </div>
     );
   };
+  
+  return (
+    <div className="w-8 h-8 bg-gradient-to-r from-gray-400 to-gray-600 rounded-full flex items-center justify-center">
+      <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+      </svg>
+    </div>
+  );
+};
 
   // تابع برای فرمت کردن قیمت
   const formatPrice = (price) => {
